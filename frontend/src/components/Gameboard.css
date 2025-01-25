@@ -1,0 +1,101 @@
+/* Full-page gradient background */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #705296, #44266c);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  /* Central white column */
+  .central-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    width: 400px; /* Adjust width as needed */
+    box-sizing: border-box; /* Include padding and borders in width */  
+}
+  
+  .puzzle-label {
+    font-size: 1.2em;
+    color: #000;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+  
+  .gameboard {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #000; /* Outer border - thicker */
+    padding: 2px;
+    background-color: #000; /* Ensure board has a white background */
+    border-radius: 10px; /* Slightly curved corners */
+    margin: 0 auto;
+    margin-bottom: 16px; /* Add space below the board */
+  }
+  
+  .queen-icon {
+    width: 25px; 
+    height: 25px;
+    display: block;
+    margin: auto; /* Center the icon within the cell */
+    position: relative; /* Required to align within the cell */
+    top: 50%; /* Move to the middle of the cell */
+    transform: translateY(-50%); /* Adjust to perfectly center */
+  }
+
+  .row {
+    display: flex;
+    
+  }
+  
+  .cell {
+    width: 45px; 
+    height: 45px;
+    border: 0.5px solid #000; /* Thin inner border */
+    box-sizing: border-box;
+    background-clip: padding-box; /* Ensures hover shade doesn't affect the border */
+    transition: background-color 0.3s ease; /* Smooth transition */
+  }
+  
+  .cell:hover {
+    filter: brightness(1.2); /* Brighten the cell slightly */
+    transition: filter 0.3s ease;
+  }
+
+  .reveal-button {
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #fff;
+    background-color: #44266c;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .reveal-button:hover {
+    background-color: #705296;
+  }
+  
+  .border-top {
+    border-top: 1.5x solid #000;
+  }
+  
+  .border-bottom {
+    border-bottom: 1.5px solid #000;
+  }
+  
+  .border-left {
+    border-left: 1px solid #000;
+  }
+  
+  .border-right {
+    border-right: 1px solid #000;
+  }
