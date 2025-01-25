@@ -4,7 +4,7 @@ import './Gameboard.css';
 // Define prop types
 interface GameboardProps {
     board: number[][];
-    colors: string[];
+    colours: string[];
     solution: boolean[][];
     queenIcon: string;
     isRevealed: boolean;
@@ -12,7 +12,7 @@ interface GameboardProps {
 
 const Gameboard: React.FC<GameboardProps> = ({
     board,
-    colors,
+    colours,
     solution,
     queenIcon,
     isRevealed,
@@ -47,7 +47,7 @@ const Gameboard: React.FC<GameboardProps> = ({
                                 colIndex
                             )}`}
                             style={{
-                                backgroundColor: colors[cell] || 'transparent',
+                                backgroundColor: colours[cell] || 'transparent',
                             }}
                         >
                             {solution[rowIndex][colIndex] && isRevealed && (

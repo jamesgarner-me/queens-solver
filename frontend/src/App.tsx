@@ -15,10 +15,10 @@ interface BoardData {
 }
 
 function App() {
-    // Define colors for each number in the board
+    // Define colours for each number in the board
     // Todo define more colours to reflect larger board
     // Todo move this somewhere else
-    const colors = [
+    const colours = [
         '#b7a4de', // 0
         '#f7cc9a', // 1
         '#9ebdfa', // 2
@@ -84,7 +84,7 @@ function App() {
             {boardData && solution && (
                 <Gameboard
                     board={boardData.board}
-                    colors={colors}
+                    colours={colours}
                     solution={solution}
                     queenIcon={queenIcon}
                     isRevealed={isRevealed}
