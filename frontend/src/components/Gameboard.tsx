@@ -5,6 +5,7 @@ import './Gameboard.css';
 interface GameboardProps {
     board: number[][];
     colours: string[];
+    hints: number[][];
     solution: boolean[][];
     queenIcon: string;
     isRevealed: boolean;
@@ -13,6 +14,7 @@ interface GameboardProps {
 const Gameboard: React.FC<GameboardProps> = ({
     board,
     colours,
+    hints,
     solution,
     queenIcon,
     isRevealed,
@@ -50,7 +52,9 @@ const Gameboard: React.FC<GameboardProps> = ({
                                 backgroundColor: colours[cell] || 'transparent',
                             }}
                         >
-                            {solution[rowIndex][colIndex] && isRevealed && (
+                            {(hints[rowIndex][colIndex] ||
+                                (solution[rowIndex][colIndex] &&
+                                    isRevealed)) && (
                                 <img
                                     src={queenIcon}
                                     alt="Queen"

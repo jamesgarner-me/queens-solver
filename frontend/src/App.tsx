@@ -9,6 +9,7 @@ interface Solution {
 }
 
 interface BoardData {
+    gridSize: number;
     puzzleId: number;
     board: number[][];
     solution: Solution[];
@@ -30,7 +31,10 @@ function App() {
     ];
 
     const [boardData, setBoardData] = useState<BoardData | null>(null);
+    const [gridSize, setGridSize] = useState<number>(0);
     const [solution, setSolution] = useState<boolean[][]>();
+    const [hints, setHints] = useState<boolean[][]>();
+    const [numberOfHintsToShow, setNumberOfHintsToShow] = useState<number>(0);
     const [isRevealed, setIsRevealed] = useState(false);
     const [revealButtonLabel, setRevealButtonLabel] =
         useState('Reveal Solution');
@@ -40,7 +44,7 @@ function App() {
             try {
                 // todo implement loading overlay/modal
                 const response = await fetch(
-                    'https://run.mocky.io/v3/f971c020-03c0-463d-8ae3-52d9e1d9d3b5'
+                    'https://run.mocky.io/v3/e401db6f-ebc2-44e9-bdb9-6953b4bb496e'
                 );
                 const data = await response.json();
                 setBoardData(data);
@@ -53,19 +57,31 @@ function App() {
     }, []);
 
     useEffect(() => {
-        if (boardData?.solution) {
-            // todo make size dynamic based on puzzle size
-            const solution = Array(8)
-                .fill(null)
-                .map(() => Array(8).fill(false));
+        if (boardData?.gridSize) {
+            setGridSize(boardData.gridSize);
+        }
+        if (boardData?.solution && gridSize > 0) {
+            const emptyArray = returnEmptyArray(gridSize);
+
+            setHints(emptyArray);
+
+            const solution = emptyArray.map((row) => [...row]);
 
             boardData.solution.forEach(({ row, col }) => {
                 solution[row][col] = true;
             });
-
             setSolution(solution);
         }
-    }, [boardData]);
+    }, [boardData, gridSize]);
+
+    const returnEmptyArray = (size: number): boolean[][] => {
+        return Array(size)
+            .fill(null)
+            .map(() => Array(size).fill(false));
+    };
+    const isMaxHintsShown = (): boolean => {
+        return numberOfHintsToShow > gridSize;
+    };
 
     const toggleReveal = () => {
         setIsRevealed(!isRevealed);
@@ -74,6 +90,30 @@ function App() {
                 ? 'Hide Solution'
                 : 'Reveal Solution'
         );
+        // reset hints shown
+        setHints(returnEmptyArray(gridSize));
+        setNumberOfHintsToShow(0);
+    };
+
+    const showHint = () => {
+        if (!isMaxHintsShown()) {
+            const numHints = numberOfHintsToShow + 1;
+            setNumberOfHintsToShow(numHints);
+
+            let i = 0;
+            solution?.some((row, rowIndex) => {
+                return row.some((cell, colIndex) => {
+                    if (cell) {
+                        hints![rowIndex][colIndex] = true;
+                        i++;
+                        if (i === numHints) {
+                            return true; // break
+                        }
+                    }
+                    return false;
+                });
+            });
+        }
     };
 
     return (
@@ -85,13 +125,21 @@ function App() {
                 <Gameboard
                     board={boardData.board}
                     colours={colours}
+                    hints={hints}
                     solution={solution}
                     queenIcon={queenIcon}
                     isRevealed={isRevealed}
                 />
             )}
             <button
-                className="reveal-button"
+                className="button"
+                onClick={showHint}
+                disabled={!boardData || isMaxHintsShown()}
+            >
+                {boardData ? 'Show hint ✨' : 'Loading...'}
+            </button>
+            <button
+                className="button"
                 onClick={toggleReveal}
                 disabled={!boardData}
             >
