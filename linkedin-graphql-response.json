@@ -1,0 +1,692 @@
+{
+    "data":
+    {
+        "_recipeType": "com.linkedin.4dae25b8f538b4bbd5ba992284dd18a1",
+        "_type": "com.linkedin.4dae25b8f538b4bbd5ba992284dd18a1",
+        "identityDashGamesByTodaysGame":
+        {
+            "_type": "com.linkedin.restli.common.CollectionResponse",
+            "_recipeType": "com.linkedin.922924f5db5e0933a80f3ae4fe019c30",
+            "elements":
+            [
+                {
+                    "winCount": 0,
+                    "gameTypeId": 3,
+                    "hasPlayedGameTypeBefore": false,
+                    "playerGameSettings":
+                    {
+                        "isHapticsEnabled": true,
+                        "individualGameSettings":
+                        {
+                            "lotkaGameSettings": null,
+                            "queensGameSettings":
+                            {
+                                "_type": "com.linkedin.voyager.dash.identity.game.QueensGameSettings",
+                                "isAutoCheckedToggled": true,
+                                "_recipeType": "com.linkedin.e3da591113b886823ddb3d5a0b2cb78f",
+                                "isAutoNotateToggled": false,
+                                "isHowToPlayInstructionsExpanded": true
+                            },
+                            "crossclimbGameSettings": null
+                        },
+                        "isSoundEnabled": true,
+                        "_type": "com.linkedin.voyager.dash.identity.game.PlayerGameSettings",
+                        "_recipeType": "com.linkedin.600cbebe2e66c9bfee64807b4dc5d466",
+                        "isTimerHidden": true,
+                        "visibilitySetting": "HIDDEN"
+                    },
+                    "_type": "com.linkedin.voyager.dash.identity.game.Game",
+                    "puzzleId": 273,
+                    "_recipeType": "com.linkedin.120396a90d4814be79985b967f984ba0",
+                    "gamePuzzle":
+                    {
+                        "blueprintGamePuzzle": null,
+                        "crossClimbGamePuzzle": null,
+                        "queensGamePuzzle":
+                        {
+                            "_type": "com.linkedin.voyager.dash.identity.game.QueensGamePuzzle",
+                            "gridSize": 8,
+                            "solution":
+                            [
+                                {
+                                    "_type": "com.linkedin.voyager.dash.identity.game.GridPosition",
+                                    "col": 3,
+                                    "row": 0,
+                                    "_recipeType": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                },
+                                {
+                                    "_type": "com.linkedin.voyager.dash.identity.game.GridPosition",
+                                    "col": 1,
+                                    "row": 1,
+                                    "_recipeType": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                },
+                                {
+                                    "_type": "com.linkedin.voyager.dash.identity.game.GridPosition",
+                                    "col": 5,
+                                    "row": 2,
+                                    "_recipeType": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                },
+                                {
+                                    "_type": "com.linkedin.voyager.dash.identity.game.GridPosition",
+                                    "col": 2,
+                                    "row": 3,
+                                    "_recipeType": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                },
+                                {
+                                    "_type": "com.linkedin.voyager.dash.identity.game.GridPosition",
+                                    "col": 4,
+                                    "row": 4,
+                                    "_recipeType": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                },
+                                {
+                                    "_type": "com.linkedin.voyager.dash.identity.game.GridPosition",
+                                    "col": 6,
+                                    "row": 5,
+                                    "_recipeType": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                },
+                                {
+                                    "_type": "com.linkedin.voyager.dash.identity.game.GridPosition",
+                                    "col": 0,
+                                    "row": 6,
+                                    "_recipeType": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                },
+                                {
+                                    "_type": "com.linkedin.voyager.dash.identity.game.GridPosition",
+                                    "col": 7,
+                                    "row": 7,
+                                    "_recipeType": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                }
+                            ],
+                            "_recipeType": "com.linkedin.387a9efe8138e7ab145f07f95da8239d",
+                            "colorGrid":
+                            [
+                                {
+                                    "_recipeType": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b",
+                                    "_type": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow",
+                                    "colors":
+                                    [
+                                        7,
+                                        7,
+                                        7,
+                                        7,
+                                        7,
+                                        7,
+                                        7,
+                                        7
+                                    ]
+                                },
+                                {
+                                    "_recipeType": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b",
+                                    "_type": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow",
+                                    "colors":
+                                    [
+                                        7,
+                                        1,
+                                        1,
+                                        2,
+                                        7,
+                                        7,
+                                        7,
+                                        7
+                                    ]
+                                },
+                                {
+                                    "_recipeType": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b",
+                                    "_type": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow",
+                                    "colors":
+                                    [
+                                        1,
+                                        1,
+                                        2,
+                                        2,
+                                        3,
+                                        4,
+                                        4,
+                                        7
+                                    ]
+                                },
+                                {
+                                    "_recipeType": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b",
+                                    "_type": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow",
+                                    "colors":
+                                    [
+                                        5,
+                                        5,
+                                        2,
+                                        3,
+                                        3,
+                                        4,
+                                        7,
+                                        7
+                                    ]
+                                },
+                                {
+                                    "_recipeType": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b",
+                                    "_type": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow",
+                                    "colors":
+                                    [
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        3,
+                                        6,
+                                        6,
+                                        7
+                                    ]
+                                },
+                                {
+                                    "_recipeType": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b",
+                                    "_type": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow",
+                                    "colors":
+                                    [
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        6,
+                                        0
+                                    ]
+                                },
+                                {
+                                    "_recipeType": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b",
+                                    "_type": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow",
+                                    "colors":
+                                    [
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        0,
+                                        0
+                                    ]
+                                },
+                                {
+                                    "_recipeType": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b",
+                                    "_type": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow",
+                                    "colors":
+                                    [
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        5,
+                                        0
+                                    ]
+                                }
+                            ]
+                        },
+                        "lotkaGamePuzzle": null
+                    },
+                    "hasTimer": true,
+                    "entityUrn": "urn:li:fsd_game:(ACoAAAAAAAABWzs7tPEzjbzdTu0bZDhDZpin_Ds,3,273)",
+                    "gameStoredRecord":
+                    {
+                        "_type": "com.linkedin.voyager.dash.identity.game.GameStoredRecord",
+                        "timeElapsed": null,
+                        "gamePlayState": "UNKNOWN",
+                        "_recipeType": "com.linkedin.943df5a938e1620604def64ba76595eb",
+                        "gameState": null
+                    },
+                    "isTutorialGame": false
+                }
+            ]
+        }
+    },
+    "extensions":
+    {
+        "webMetadata":
+        {
+            "microSchema":
+            {
+                "isGraphQL": true,
+                "version": "2.1",
+                "types":
+                {
+                    "com.linkedin.387a9efe8138e7ab145f07f95da8239d":
+                    {
+                        "fields":
+                        {
+                            "solution":
+                            {
+                                "type":
+                                {
+                                    "array": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                                }
+                            },
+                            "colorGrid":
+                            {
+                                "type":
+                                {
+                                    "array": "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b"
+                                }
+                            },
+                            "gridSize":
+                            {
+                                "type": "int"
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.QueensGamePuzzle"
+                    },
+                    "com.linkedin.4dae25b8f538b4bbd5ba992284dd18a1":
+                    {
+                        "fields":
+                        {
+                            "identityDashGamesByTodaysGame":
+                            {
+                                "type": "com.linkedin.922924f5db5e0933a80f3ae4fe019c30"
+                            }
+                        },
+                        "baseType": "com.linkedin.graphql.Query"
+                    },
+                    "com.linkedin.b2b3f689d06aefa3e2727f9e2ba5cdc4":
+                    {
+                        "fields":
+                        {
+                            "isAutoReorderToggled":
+                            {
+                                "type": "boolean"
+                            },
+                            "isAutoCheckedToggled":
+                            {
+                                "type": "boolean"
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.CrossclimbGameSettings"
+                    },
+                    "com.linkedin.90e71dbd35305c7b1d7ddb5a1020dc8b":
+                    {
+                        "fields":
+                        {
+                            "colors":
+                            {
+                                "type":
+                                {
+                                    "array": "int"
+                                }
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.QueensGameColorRow"
+                    },
+                    "com.linkedin.b5b8ed6b44ebebb302afc366c609ccf8":
+                    {
+                        "fields":
+                        {
+                            "rungs":
+                            {
+                                "type":
+                                {
+                                    "array": "com.linkedin.8ed4ec05f18cde0e6ec100180c604753"
+                                }
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.CrossClimbGamePuzzle"
+                    },
+                    "com.linkedin.863c314c90fe826c8a7b8b2cd2d4662f":
+                    {
+                        "fields":
+                        {
+                            "queensGameCellType":
+                            {
+                                "type": "com.linkedin.voyager.dash.identity.game.QueensGameCellType"
+                            },
+                            "gridPosition":
+                            {
+                                "type": "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e"
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.QueensGameCellState"
+                    },
+                    "com.linkedin.120396a90d4814be79985b967f984ba0":
+                    {
+                        "fields":
+                        {
+                            "winCount":
+                            {
+                                "type": "int"
+                            },
+                            "gameTypeId":
+                            {
+                                "type": "long"
+                            },
+                            "entityUrn":
+                            {
+                                "type": "com.linkedin.voyager.dash.common.GameUrn"
+                            },
+                            "gameStoredRecord":
+                            {
+                                "type": "com.linkedin.943df5a938e1620604def64ba76595eb"
+                            },
+                            "hasPlayedGameTypeBefore":
+                            {
+                                "type": "boolean"
+                            },
+                            "playerGameSettings":
+                            {
+                                "type": "com.linkedin.600cbebe2e66c9bfee64807b4dc5d466"
+                            },
+                            "puzzleId":
+                            {
+                                "type": "long"
+                            },
+                            "gamePuzzle":
+                            {
+                                "derivedFrom": "gamePuzzleUnion",
+                                "type":
+                                {
+                                    "union":
+                                    {
+                                        "blueprintGamePuzzle": "com.linkedin.14cec2bafd7f6754f84ff4a71d03ec31",
+                                        "crossClimbGamePuzzle": "com.linkedin.b5b8ed6b44ebebb302afc366c609ccf8",
+                                        "queensGamePuzzle": "com.linkedin.387a9efe8138e7ab145f07f95da8239d",
+                                        "lotkaGamePuzzle": "com.linkedin.297d93e56a69d893c4dd2d2fbbe58cd6"
+                                    }
+                                }
+                            },
+                            "isTutorialGame":
+                            {
+                                "type": "boolean"
+                            },
+                            "hasTimer":
+                            {
+                                "type": "boolean"
+                            },
+                            "gamePuzzleUnion":
+                            {
+                                "type":
+                                {
+                                    "union":
+                                    {
+                                        "blueprintGamePuzzle": "com.linkedin.14cec2bafd7f6754f84ff4a71d03ec31",
+                                        "crossClimbGamePuzzle": "com.linkedin.b5b8ed6b44ebebb302afc366c609ccf8",
+                                        "queensGamePuzzle": "com.linkedin.387a9efe8138e7ab145f07f95da8239d",
+                                        "lotkaGamePuzzle": "com.linkedin.297d93e56a69d893c4dd2d2fbbe58cd6"
+                                    }
+                                }
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.Game"
+                    },
+                    "com.linkedin.297d93e56a69d893c4dd2d2fbbe58cd6":
+                    {
+                        "fields":
+                        {
+                            "edges":
+                            {
+                                "type":
+                                {
+                                    "array": "com.linkedin.501b2fc86a160e6889121635bbbcb3aa"
+                                }
+                            },
+                            "presetCellIdxes":
+                            {
+                                "type":
+                                {
+                                    "array": "int"
+                                }
+                            },
+                            "gridSize":
+                            {
+                                "type": "int"
+                            },
+                            "solution":
+                            {
+                                "type":
+                                {
+                                    "array": "com.linkedin.voyager.dash.identity.game.LotkaCellValue"
+                                }
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.LotkaGamePuzzle"
+                    },
+                    "com.linkedin.e3da591113b886823ddb3d5a0b2cb78f":
+                    {
+                        "fields":
+                        {
+                            "isAutoNotateToggled":
+                            {
+                                "type": "boolean"
+                            },
+                            "isHowToPlayInstructionsExpanded":
+                            {
+                                "type": "boolean"
+                            },
+                            "isAutoCheckedToggled":
+                            {
+                                "type": "boolean"
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.QueensGameSettings"
+                    },
+                    "com.linkedin.14cec2bafd7f6754f84ff4a71d03ec31":
+                    {
+                        "fields":
+                        {
+                            "solutions":
+                            {
+                                "type":
+                                {
+                                    "array": "string"
+                                }
+                            },
+                            "clues":
+                            {
+                                "type":
+                                {
+                                    "array": "string"
+                                }
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.BlueprintGamePuzzle"
+                    },
+                    "com.linkedin.943df5a938e1620604def64ba76595eb":
+                    {
+                        "fields":
+                        {
+                            "timeElapsed":
+                            {
+                                "type": "int"
+                            },
+                            "gameStateUnion":
+                            {
+                                "type":
+                                {
+                                    "union":
+                                    {
+                                        "queensGameState":
+                                        {
+                                            "array": "com.linkedin.863c314c90fe826c8a7b8b2cd2d4662f"
+                                        },
+                                        "blueprintGameState":
+                                        {
+                                            "array": "string"
+                                        },
+                                        "crossClimbGameState":
+                                        {
+                                            "array": "com.linkedin.8ed4ec05f18cde0e6ec100180c604753"
+                                        },
+                                        "lotkaGameState":
+                                        {
+                                            "array": "com.linkedin.voyager.dash.identity.game.LotkaCellValue"
+                                        }
+                                    }
+                                }
+                            },
+                            "gamePlayState":
+                            {
+                                "type": "com.linkedin.voyager.dash.identity.game.GamePlayState"
+                            },
+                            "gameState":
+                            {
+                                "derivedFrom": "gameStateUnion",
+                                "type":
+                                {
+                                    "union":
+                                    {
+                                        "queensGameState":
+                                        {
+                                            "array": "com.linkedin.863c314c90fe826c8a7b8b2cd2d4662f"
+                                        },
+                                        "blueprintGameState":
+                                        {
+                                            "array": "string"
+                                        },
+                                        "crossClimbGameState":
+                                        {
+                                            "array": "com.linkedin.8ed4ec05f18cde0e6ec100180c604753"
+                                        },
+                                        "lotkaGameState":
+                                        {
+                                            "array": "com.linkedin.voyager.dash.identity.game.LotkaCellValue"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.GameStoredRecord"
+                    },
+                    "com.linkedin.ac723876a6921f851a329352e3d30fbc":
+                    {
+                        "fields":
+                        {
+                            "isHowToPlayInstructionsExpanded":
+                            {
+                                "type": "boolean"
+                            },
+                            "isAutoCheckedToggled":
+                            {
+                                "type": "boolean"
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.LotkaGameSettings"
+                    },
+                    "com.linkedin.501b2fc86a160e6889121635bbbcb3aa":
+                    {
+                        "fields":
+                        {
+                            "endIdx":
+                            {
+                                "type": "int"
+                            },
+                            "isEqual":
+                            {
+                                "type": "boolean"
+                            },
+                            "startIdx":
+                            {
+                                "type": "int"
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.LotkaEdge"
+                    },
+                    "com.linkedin.922924f5db5e0933a80f3ae4fe019c30":
+                    {
+                        "fields":
+                        {
+                            "elements":
+                            {
+                                "type":
+                                {
+                                    "array": "com.linkedin.120396a90d4814be79985b967f984ba0"
+                                }
+                            }
+                        },
+                        "baseType": "com.linkedin.restli.common.CollectionResponse"
+                    },
+                    "com.linkedin.2ad2706e708c3c7b27888e2caaedbd2e":
+                    {
+                        "fields":
+                        {
+                            "col":
+                            {
+                                "type": "int"
+                            },
+                            "row":
+                            {
+                                "type": "int"
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.GridPosition"
+                    },
+                    "com.linkedin.600cbebe2e66c9bfee64807b4dc5d466":
+                    {
+                        "fields":
+                        {
+                            "isTimerHidden":
+                            {
+                                "type": "boolean"
+                            },
+                            "isHapticsEnabled":
+                            {
+                                "type": "boolean"
+                            },
+                            "individualGameSettings":
+                            {
+                                "derivedFrom": "individualGameSettingsUnion",
+                                "type":
+                                {
+                                    "union":
+                                    {
+                                        "lotkaGameSettings": "com.linkedin.ac723876a6921f851a329352e3d30fbc",
+                                        "queensGameSettings": "com.linkedin.e3da591113b886823ddb3d5a0b2cb78f",
+                                        "crossclimbGameSettings": "com.linkedin.b2b3f689d06aefa3e2727f9e2ba5cdc4"
+                                    }
+                                }
+                            },
+                            "visibilitySetting":
+                            {
+                                "type": "com.linkedin.voyager.dash.identity.game.NetworkVisibilitySetting"
+                            },
+                            "isSoundEnabled":
+                            {
+                                "type": "boolean"
+                            },
+                            "individualGameSettingsUnion":
+                            {
+                                "type":
+                                {
+                                    "union":
+                                    {
+                                        "lotkaGameSettings": "com.linkedin.ac723876a6921f851a329352e3d30fbc",
+                                        "queensGameSettings": "com.linkedin.e3da591113b886823ddb3d5a0b2cb78f",
+                                        "crossclimbGameSettings": "com.linkedin.b2b3f689d06aefa3e2727f9e2ba5cdc4"
+                                    }
+                                }
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.PlayerGameSettings"
+                    },
+                    "com.linkedin.8ed4ec05f18cde0e6ec100180c604753":
+                    {
+                        "fields":
+                        {
+                            "solutionRungIndex":
+                            {
+                                "type": "int"
+                            },
+                            "word":
+                            {
+                                "type": "string"
+                            },
+                            "guess":
+                            {
+                                "type": "string"
+                            },
+                            "clue":
+                            {
+                                "type": "string"
+                            }
+                        },
+                        "baseType": "com.linkedin.voyager.dash.identity.game.Rung"
+                    }
+                }
+            }
+        }
+    }
+}
