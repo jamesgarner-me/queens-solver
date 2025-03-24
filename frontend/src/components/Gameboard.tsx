@@ -27,9 +27,7 @@ const Gameboard: React.FC<GameboardProps> = ({
             top: row === 0 || board[row - 1][col] !== current,
             bottom: row === board.length - 1 || board[row + 1][col] !== current,
             left: col === 0 || board[row][col - 1] !== current,
-            right:
-                col === board[row].length - 1 ||
-                board[row][col + 1] !== current,
+            right: col === board[row].length - 1 || board[row][col + 1] !== current,
         };
 
         // Return classes for the borders
@@ -41,7 +39,7 @@ const Gameboard: React.FC<GameboardProps> = ({
 
     const handleCellClick = (row: number, col: number) => {
         const colorIndex = board[row][col];
-        
+
         // If this color hasn't been revealed yet
         if (!revealedColors.has(colorIndex)) {
             // Find the queen position for this color region
@@ -64,23 +62,15 @@ const Gameboard: React.FC<GameboardProps> = ({
                     {row.map((cell, colIndex) => (
                         <div
                             key={`${rowIndex}-${colIndex}`}
-                            className={`cell ${getCellClass(
-                                rowIndex,
-                                colIndex
-                            )}`}
+                            className={`cell ${getCellClass(rowIndex, colIndex)}`}
                             style={{
                                 backgroundColor: colours[cell] || 'transparent',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
                             }}
                             onClick={() => handleCellClick(rowIndex, colIndex)}
                         >
-                            {(solution[rowIndex][colIndex] &&
-                                (isRevealed || revealedColors.has(cell))) && (
-                                <img
-                                    src={queenIcon}
-                                    alt="Queen"
-                                    className="queen-icon"
-                                />
+                            {solution[rowIndex][colIndex] && (isRevealed || revealedColors.has(cell)) && (
+                                <img src={queenIcon} alt="Queen" className="queen-icon" />
                             )}
                         </div>
                     ))}

@@ -7,9 +7,9 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-  }
-  
-  .central-container {
+}
+
+.central-container {
     background-color: #ffffff;
     border-radius: 10px;
     padding: 30px;
@@ -21,115 +21,117 @@ body {
     margin: 20px;
     box-sizing: border-box;
 }
-  
-  .puzzle-label {
+
+.puzzle-label {
     font-size: 1.2em;
     color: #000;
     font-weight: bold;
     margin-bottom: 16px;
-  }
-  
-  .gameboard {
+}
+
+.gameboard {
     display: flex;
     flex-direction: column;
-    border: 2px solid #000; 
+    border: 2px solid #000;
     padding: 2px;
-    background-color: #000; 
-    border-radius: 10px; 
+    background-color: #000;
+    border-radius: 10px;
     margin: 0 auto;
     margin-bottom: 16px;
     box-sizing: border-box;
     max-width: 100%;
     width: max-content;
     overflow: hidden;
-  }
-  
-  .queen-icon {
-    width: 25px; 
+}
+
+.queen-icon {
+    width: 25px;
     height: 25px;
     display: block;
     margin: auto;
     object-fit: contain;
-  }
+}
 
-  .row {
+.row {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-  }
-  
-  .cell {
-    width: 40px; 
+}
+
+.cell {
+    width: 40px;
     height: 40px;
-    border: 0.5px solid #000; 
+    border: 0.5px solid #000;
     box-sizing: border-box;
-    background-clip: padding-box; 
+    background-clip: padding-box;
     transition: background-color 0.3s ease;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-shrink: 0; /* Prevent cell shrinking */
-  }
-  
-  .cell:hover {
+}
+
+.cell:hover {
     filter: brightness(1.2); /* Brighten the cell slightly */
     transition: filter 0.3s ease;
-  }
+}
 
-  .button {
+.button {
     margin: 0 8px;
     padding: 12px 24px;
     font-size: 1em;
     font-weight: bold;
-    color: #ffffff; 
+    color: #ffffff;
     background-color: #44266c;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s ease-in-out;
-    height: 50px; 
+    transition:
+        background-color 0.3s,
+        transform 0.1s ease-in-out;
+    height: 50px;
     line-height: 1.5;
-  }
-  
-  .button:hover {
+}
+
+.button:hover {
     background-color: #573884;
     transform: scale(1.05);
-  }
+}
 
-  .button:focus {
+.button:focus {
     outline: 2px solid #000;
     outline-offset: 2px;
     box-shadow: 0 0 3px 2px #44266c;
-  }
-  
-  .button:active {
+}
+
+.button:active {
     background-color: #573884;
     transform: scale(0.98);
-  }
+}
 
-  .button:disabled {
+.button:disabled {
     background-color: #a5a5a5;
-    color: #6c6c6c; 
+    color: #6c6c6c;
     cursor: not-allowed;
     opacity: 0.7;
-  }
+}
 
-  .reveal-button:hover {
+.reveal-button:hover {
     background-color: #705296;
-  }
-  
-  .border-top {
+}
+
+.border-top {
     border-top: 2px solid #000 !important;
-  }
-  
-  .border-bottom {
+}
+
+.border-bottom {
     border-bottom: 2px solid #000 !important;
-  }
-  
-  .border-left {
+}
+
+.border-left {
     border-left: 2px solid #000 !important;
-  }
-  
-  .border-right {
+}
+
+.border-right {
     border-right: 2px solid #000 !important;
-  }
+}

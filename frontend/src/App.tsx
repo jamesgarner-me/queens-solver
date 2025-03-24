@@ -18,7 +18,7 @@ interface BoardData {
 function App() {
     // Define colours for each number in the board
     // Todo define more colours to reflect larger board
-    // Todo move this somewhere else 
+    // Todo move this somewhere else
     const colours = [
         '#BBA2E2', // 0
         '#FFC992', // 1
@@ -37,8 +37,7 @@ function App() {
     const [solution, setSolution] = useState<boolean[][]>();
     const [revealedColors, setRevealedColors] = useState<Set<number>>(new Set());
     const [isRevealed, setIsRevealed] = useState(false);
-    const [revealButtonLabel, setRevealButtonLabel] =
-        useState('Reveal Solution');
+    const [revealButtonLabel, setRevealButtonLabel] = useState('Reveal Solution');
 
     // Effect to handle automatic reveal when all queens are shown
     useEffect(() => {
@@ -52,9 +51,7 @@ function App() {
         const fetchBoardData = async () => {
             try {
                 // todo implement loading overlay/modal
-                const response = await fetch(
-                    'http://localhost:8000/boards/latest'
-                );
+                const response = await fetch('http://localhost:8000/boards/latest');
                 const data = await response.json();
                 setBoardData(data);
             } catch (e) {
@@ -86,7 +83,7 @@ function App() {
 
         // Find the next color region that doesn't have a queen revealed
         const colorRegions = new Map<number, { row: number; col: number }>();
-        
+
         // Map each color to its queen position
         boardData.board.forEach((row, rowIndex) => {
             row.forEach((colorIndex, colIndex) => {
@@ -110,7 +107,7 @@ function App() {
         const newIsRevealed = !isRevealed;
         setIsRevealed(newIsRevealed);
         setRevealButtonLabel(newIsRevealed ? 'Hide Solution' : 'Reveal Solution');
-        
+
         // If revealing solution, mark all colors as revealed
         if (newIsRevealed && boardData && boardData.solution) {
             // Collect all color indexes that have queens
@@ -125,7 +122,7 @@ function App() {
                 });
             }
             setRevealedColors(colorsWithQueens);
-        } 
+        }
         // Reset revealed colors when hiding
         else if (!newIsRevealed) {
             setRevealedColors(new Set());
@@ -134,9 +131,7 @@ function App() {
 
     return (
         <div className="central-container">
-            <div className="puzzle-label">
-                {boardData ? `PuzzleId: ${boardData.puzzleId}` : 'Loading...'}
-            </div>
+            <div className="puzzle-label">{boardData ? `PuzzleId: ${boardData.puzzleId}` : 'Loading...'}</div>
             {boardData && solution && (
                 <Gameboard
                     board={boardData.board}
@@ -155,11 +150,7 @@ function App() {
             >
                 {boardData ? 'Show hint ✨' : 'Loading...'}
             </button>
-            <button
-                className="button"
-                onClick={toggleReveal}
-                disabled={!boardData}
-            >
+            <button className="button" onClick={toggleReveal} disabled={!boardData}>
                 {boardData ? revealButtonLabel : 'Loading...'}
             </button>
         </div>
