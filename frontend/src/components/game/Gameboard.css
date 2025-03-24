@@ -1,0 +1,62 @@
+.gameboard {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #000;
+    padding: 2px;
+    background-color: #000;
+    border-radius: 10px;
+    margin: 0 auto;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    max-width: 100%;
+    width: max-content;
+    overflow: hidden;
+}
+
+.queen-icon {
+    width: 25px;
+    height: 25px;
+    display: block;
+    margin: auto;
+    object-fit: contain;
+}
+
+.row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    border: 0.5px solid #000;
+    box-sizing: border-box;
+    background-clip: padding-box;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0; /* Prevent cell shrinking */
+}
+
+.cell:hover {
+    filter: brightness(1.2); /* Brighten the cell slightly */
+    transition: filter 0.3s ease;
+}
+
+.border-top {
+    border-top: 2px solid #000 !important;
+}
+
+.border-bottom {
+    border-bottom: 2px solid #000 !important;
+}
+
+.border-left {
+    border-left: 2px solid #000 !important;
+}
+
+.border-right {
+    border-right: 2px solid #000 !important;
+}
