@@ -18,7 +18,7 @@ interface BoardData {
 function App() {
     // Define colours for each number in the board
     // Todo define more colours to reflect larger board
-    // Todo move this somewhere else
+    // Todo move this somewhere else 
     const colours = [
         '#BBA2E2', // 0
         '#FFC992', // 1
