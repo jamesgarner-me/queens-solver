@@ -35,8 +35,7 @@ function App() {
     const [boardData, setBoardData] = useState<BoardData | null>(null);
     const [gridSize, setGridSize] = useState<number>(0);
     const [solution, setSolution] = useState<boolean[][]>();
-    const [hints, setHints] = useState<boolean[][]>();
-    const [numberOfHintsToShow, setNumberOfHintsToShow] = useState<number>(0);
+    const [revealedColors, setRevealedColors] = useState<Set<number>>(new Set());
     const [isRevealed, setIsRevealed] = useState(false);
     const [revealButtonLabel, setRevealButtonLabel] =
         useState('Reveal Solution');
@@ -63,11 +62,9 @@ function App() {
             setGridSize(boardData.gridSize);
         }
         if (boardData?.solution && gridSize > 0) {
-            const emptyArray = returnEmptyArray(gridSize);
-
-            setHints(emptyArray);
-
-            const solution = emptyArray.map((row) => [...row]);
+            const solution = Array(gridSize)
+                .fill(null)
+                .map(() => Array(gridSize).fill(false));
 
             boardData.solution.forEach(({ row, col }) => {
                 solution[row][col] = true;
@@ -76,46 +73,39 @@ function App() {
         }
     }, [boardData, gridSize]);
 
-    const returnEmptyArray = (size: number): boolean[][] => {
-        return Array(size)
-            .fill(null)
-            .map(() => Array(size).fill(false));
-    };
-    const isMaxHintsShown = (): boolean => {
-        return numberOfHintsToShow >= gridSize;
+    const showHint = () => {
+        if (!boardData || !solution) return;
+
+        // Find the next color region that doesn't have a queen revealed
+        const colorRegions = new Map<number, { row: number; col: number }>();
+        
+        // Map each color to its queen position
+        boardData.board.forEach((row, rowIndex) => {
+            row.forEach((colorIndex, colIndex) => {
+                if (solution[rowIndex][colIndex]) {
+                    colorRegions.set(colorIndex, { row: rowIndex, col: colIndex });
+                }
+            });
+        });
+
+        // Find first unrevealed color region
+        for (const [colorIndex, _] of colorRegions) {
+            if (!revealedColors.has(colorIndex)) {
+                setRevealedColors(new Set([...revealedColors, colorIndex]));
+                return;
+            }
+        }
     };
 
-    const toggleReveal = () => {
+    const toggleReveal = () => { 
         setIsRevealed(!isRevealed);
         setRevealButtonLabel(
             revealButtonLabel === 'Reveal Solution'
                 ? 'Hide Solution'
                 : 'Reveal Solution'
         );
-        // reset hints shown
-        setHints(returnEmptyArray(gridSize));
-        setNumberOfHintsToShow(0);
-    };
-
-    const showHint = () => {
-        if (!isMaxHintsShown()) {
-            const numHints = numberOfHintsToShow + 1;
-            setNumberOfHintsToShow(numHints);
-
-            let i = 0;
-            solution?.some((row, rowIndex) => {
-                return row.some((cell, colIndex) => {
-                    if (cell) {
-                        hints![rowIndex][colIndex] = true;
-                        i++;
-                        if (i === numHints) {
-                            return true; // break
-                        }
-                    }
-                    return false;
-                });
-            });
-        }
+        // Reset revealed colors
+        setRevealedColors(new Set());
     };
 
     return (
@@ -127,7 +117,8 @@ function App() {
                 <Gameboard
                     board={boardData.board}
                     colours={colours}
-                    hints={hints}
+                    revealedColors={revealedColors}
+                    setRevealedColors={setRevealedColors}
                     solution={solution}
                     queenIcon={queenIcon}
                     isRevealed={isRevealed}
@@ -136,7 +127,7 @@ function App() {
             <button
                 className="button"
                 onClick={showHint}
-                disabled={!boardData || isMaxHintsShown()}
+                disabled={!boardData || revealedColors.size >= gridSize}
             >
                 {boardData ? 'Show hint ✨' : 'Loading...'}
             </button>
