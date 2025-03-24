@@ -40,6 +40,14 @@ function App() {
     const [revealButtonLabel, setRevealButtonLabel] =
         useState('Reveal Solution');
 
+    // Effect to handle automatic reveal when all queens are shown
+    useEffect(() => {
+        if (boardData && revealedColors.size >= boardData.solution.length) {
+            setIsRevealed(true);
+            setRevealButtonLabel('Hide Solution');
+        }
+    }, [revealedColors, boardData]);
+
     useEffect(() => {
         const fetchBoardData = async () => {
             try {
@@ -91,21 +99,37 @@ function App() {
         // Find first unrevealed color region
         for (const [colorIndex, _] of colorRegions) {
             if (!revealedColors.has(colorIndex)) {
-                setRevealedColors(new Set([...revealedColors, colorIndex]));
+                const newRevealedColors = new Set([...revealedColors, colorIndex]);
+                setRevealedColors(newRevealedColors);
                 return;
             }
         }
     };
 
-    const toggleReveal = () => { 
-        setIsRevealed(!isRevealed);
-        setRevealButtonLabel(
-            revealButtonLabel === 'Reveal Solution'
-                ? 'Hide Solution'
-                : 'Reveal Solution'
-        );
-        // Reset revealed colors
-        setRevealedColors(new Set());
+    const toggleReveal = () => {
+        const newIsRevealed = !isRevealed;
+        setIsRevealed(newIsRevealed);
+        setRevealButtonLabel(newIsRevealed ? 'Hide Solution' : 'Reveal Solution');
+        
+        // If revealing solution, mark all colors as revealed
+        if (newIsRevealed && boardData && boardData.solution) {
+            // Collect all color indexes that have queens
+            const colorsWithQueens = new Set<number>();
+            if (solution) {
+                boardData.board.forEach((row, rowIndex) => {
+                    row.forEach((colorIndex, colIndex) => {
+                        if (solution[rowIndex][colIndex]) {
+                            colorsWithQueens.add(colorIndex);
+                        }
+                    });
+                });
+            }
+            setRevealedColors(colorsWithQueens);
+        } 
+        // Reset revealed colors when hiding
+        else if (!newIsRevealed) {
+            setRevealedColors(new Set());
+        }
     };
 
     return (
@@ -127,7 +151,7 @@ function App() {
             <button
                 className="button"
                 onClick={showHint}
-                disabled={!boardData || revealedColors.size >= gridSize}
+                disabled={!boardData || revealedColors.size >= (boardData?.solution.length ?? 0)}
             >
                 {boardData ? 'Show hint ✨' : 'Loading...'}
             </button>
