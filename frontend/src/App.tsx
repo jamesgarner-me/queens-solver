@@ -20,14 +20,16 @@ function App() {
     // Todo define more colours to reflect larger board
     // Todo move this somewhere else
     const colours = [
-        '#b7a4de', // 0
-        '#f7cc9a', // 1
-        '#9ebdfa', // 2
-        '#bcdea6', // 3
-        '#dfdfdf', // 4
-        '#ee8268', // 5
-        '#e8f395', // 6
-        '#b8b2a0', // 7
+        '#BBA2E2', // 0
+        '#FFC992', // 1
+        '#96BEFF', // 2
+        '#B3DFA0', // 3
+        '#DFDFDF', // 4
+        '#FF7B5F', // 5
+        '#E6F388', // 6
+        '#B9B29E', // 7
+        '#DFA0BF', // 8
+        '#A3D2D8', // 9
     ];
 
     const [boardData, setBoardData] = useState<BoardData | null>(null);
@@ -44,7 +46,7 @@ function App() {
             try {
                 // todo implement loading overlay/modal
                 const response = await fetch(
-                    'https://run.mocky.io/v3/e401db6f-ebc2-44e9-bdb9-6953b4bb496e'
+                    'http://localhost:8000/boards/latest'
                 );
                 const data = await response.json();
                 setBoardData(data);
@@ -80,7 +82,7 @@ function App() {
             .map(() => Array(size).fill(false));
     };
     const isMaxHintsShown = (): boolean => {
-        return numberOfHintsToShow > gridSize;
+        return numberOfHintsToShow >= gridSize;
     };
 
     const toggleReveal = () => {
