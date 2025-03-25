@@ -21,7 +21,7 @@ describe('InstructionModal', () => {
         render(<InstructionModal />);
 
         // Modal should not be visible
-        const modalElement = screen.queryByText('How to Play Queens Solver');
+        const modalElement = screen.queryByText('Using Queens Solver');
         expect(modalElement).not.toBeInTheDocument();
     });
 
@@ -36,7 +36,7 @@ describe('InstructionModal', () => {
         render(<InstructionModal />);
 
         // Modal should be visible with correct ARIA attributes
-        const modalTitle = screen.getByText('How to Play Queens Solver');
+        const modalTitle = screen.getByText('Using Queens Solver');
         expect(modalTitle).toBeInTheDocument();
 
         const dialog = screen.getByRole('dialog');

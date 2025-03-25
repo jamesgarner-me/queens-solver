@@ -55,7 +55,7 @@ const InstructionModal: React.FC = () => {
             aria-labelledby="modal-title"
         >
             <div className="modal-content" onClick={(e) => e.stopPropagation()} ref={modalRef} role="document">
-                <h2 id="modal-title">How to Play Queens Solver</h2>
+                <h2 id="modal-title">Using Queens Solver</h2>
 
                 <div className="instructions">
                     <ul>

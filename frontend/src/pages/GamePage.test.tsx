@@ -1,16 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import GamePage from './GamePage';
 import { useGameState } from '../hooks/useGameState';
+import { useModal } from '../context/ModalContext';
 
-// Mock the hook
+// Mock the hooks
 vi.mock('../hooks/useGameState', () => ({
     useGameState: vi.fn(),
+}));
+
+vi.mock('../context/ModalContext', () => ({
+    useModal: vi.fn(),
 }));
 
 describe('GamePage', () => {
     beforeEach(() => {
         vi.resetAllMocks();
+
+        // Default modal mock
+        vi.mocked(useModal).mockReturnValue({
+            isModalOpen: false,
+            openModal: vi.fn(),
+            closeModal: vi.fn(),
+        });
     });
 
     it('renders loading state correctly', () => {
@@ -105,5 +118,49 @@ describe('GamePage', () => {
         expect(screen.getByText('Puzzle ID: 269')).toBeInTheDocument();
         expect(screen.getByText('Show hint ✨')).toBeInTheDocument();
         expect(screen.getByText('Show Solution')).toBeInTheDocument();
+    });
+
+    it('renders "How to use" button and opens modal when clicked', async () => {
+        const user = userEvent.setup();
+        const mockOpenModal = vi.fn();
+
+        // Mock modal context
+        vi.mocked(useModal).mockReturnValue({
+            isModalOpen: false,
+            openModal: mockOpenModal,
+            closeModal: vi.fn(),
+        });
+
+        // Mock the game state hook
+        vi.mocked(useGameState).mockReturnValue({
+            boardData: {
+                puzzleId: 269,
+                gridSize: 8,
+                board: [],
+                solution: [],
+            },
+            loading: false,
+            error: null,
+            solution: [],
+            gridSize: 8,
+            revealedColours: new Set(),
+            isRevealed: false,
+            revealButtonLabel: 'Show Solution',
+            showHint: vi.fn(),
+            toggleReveal: vi.fn(),
+            setRevealedColours: vi.fn(),
+        });
+
+        render(<GamePage />);
+
+        // Find the "How to use" button
+        const howToUseButton = screen.getByText('How to use');
+        expect(howToUseButton).toBeInTheDocument();
+
+        // Click the button
+        await user.click(howToUseButton);
+
+        // Verify modal open function was called
+        expect(mockOpenModal).toHaveBeenCalledTimes(1);
     });
 });

@@ -43,8 +43,8 @@ const GamePage: React.FC = () => {
                 <div className="puzzle-label" aria-live="polite">
                     {boardData ? `Puzzle ID: ${boardData.puzzleId}` : 'No puzzle data'}
                 </div>
-                <button className="instruction-button" onClick={openModal} aria-label="Open how to play instructions">
-                    How to Play
+                <button className="instruction-button" onClick={openModal} aria-label="Open how to use instructions">
+                    How to use
                 </button>
             </header>
 
