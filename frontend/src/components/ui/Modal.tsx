@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Button from './Button';
 import './Modal.css';
 import { useModal } from '../../context/ModalContext';
@@ -7,6 +7,25 @@ const InstructionModal: React.FC = () => {
     const { isModalOpen, closeModal } = useModal();
     const modalRef = useRef<HTMLDivElement>(null);
     const buttonContainerRef = useRef<HTMLDivElement>(null);
+    const [showGif, setShowGif] = useState(true);
+
+    // Detect viewport size for responsive behavior
+    useEffect(() => {
+        const checkViewportSize = () => {
+            // If the viewport height is very small, hide the GIF to save space
+            setShowGif(window.innerHeight > 500);
+        };
+
+        // Initial check
+        checkViewportSize();
+
+        // Listen for resize events
+        window.addEventListener('resize', checkViewportSize);
+
+        return () => {
+            window.removeEventListener('resize', checkViewportSize);
+        };
+    }, []);
 
     useEffect(() => {
         // When modal opens, ensure mouse mode is active and focus without visible outline
@@ -80,14 +99,18 @@ const InstructionModal: React.FC = () => {
                     </ul>
                 </div>
 
-                <div className="demo-gif">
-                    <img
-                        src="/queens-solve-howto.gif"
-                        alt="Queens Solver gameplay demonstration showing how to reveal queens and use the hint button"
-                        width="100%"
-                        height="auto"
-                    />
-                </div>
+                {showGif ? (
+                    <div className="demo-gif">
+                        <img
+                            src="/queens-solve-howto.gif"
+                            alt="Queens Solver gameplay demonstration showing how to reveal queens and use the hint button"
+                            width="100%"
+                            height="auto"
+                        />
+                    </div>
+                ) : (
+                    <p className="mobile-note">Resize your screen to see the demonstration GIF.</p>
+                )}
 
                 <div className="modal-footer">
                     <div ref={buttonContainerRef} tabIndex={0}>

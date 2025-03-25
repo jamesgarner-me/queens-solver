@@ -7,9 +7,11 @@
     background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding: 20px 0;
     z-index: 1000;
     backdrop-filter: blur(2px);
+    overflow-y: auto;
 }
 
 .modal-content {
@@ -18,7 +20,8 @@
     padding: 25px;
     max-width: 90%;
     width: 500px;
-    max-height: 90vh;
+    margin-top: 5vh;
+    max-height: 85vh;
     overflow-y: auto;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     animation: modalFadeIn 0.3s ease;
@@ -90,7 +93,8 @@
 .demo-gif img {
     display: block;
     width: 100%;
-    height: auto;
+    max-height: 40vh;
+    object-fit: contain;
     border-radius: 4px;
 }
 
@@ -100,10 +104,110 @@
     margin-top: 16px;
 }
 
+.mobile-note {
+    text-align: center;
+    font-style: italic;
+    color: #666;
+    margin: 16px 0;
+    font-size: 0.9em;
+}
+
 /* Responsive adjustments */
 @media (max-width: 600px) {
+    .modal-overlay {
+        padding: 10px;
+        align-items: center;
+    }
+
     .modal-content {
         width: 95%;
         padding: 15px;
+        max-height: 90vh;
+        margin: 0;
+    }
+
+    .modal-content h2 {
+        font-size: 1.3em;
+        margin-bottom: 12px;
+    }
+
+    .instructions li {
+        margin-bottom: 10px;
+    }
+
+    .instruction-number {
+        width: 20px;
+        height: 20px;
+        font-size: 0.9em;
+        margin-right: 10px;
+    }
+
+    .instructions p {
+        font-size: 0.9em;
+    }
+
+    .demo-gif {
+        max-height: none;
+    }
+
+    .demo-gif img {
+        max-height: 30vh;
+    }
+}
+
+/* Additional adjustments for very small screens */
+@media (max-width: 360px) {
+    .modal-content {
+        padding: 10px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+
+    .instructions p {
+        font-size: 0.85em;
+    }
+
+    .demo-gif img {
+        max-height: 25vh;
+    }
+
+    .instruction-number {
+        width: 18px;
+        height: 18px;
+        font-size: 0.8em;
+    }
+}
+
+/* Portrait orientation on phones */
+@media (max-height: 700px) {
+    .modal-content {
+        margin-top: 0;
+        max-height: 95vh;
+    }
+
+    .demo-gif img {
+        max-height: 25vh;
+    }
+}
+
+/* Extra adjustments for very short screens */
+@media (max-height: 500px) {
+    .modal-content {
+        padding: 10px;
+    }
+
+    .modal-content h2 {
+        margin-bottom: 10px;
+    }
+
+    .instructions li {
+        margin-bottom: 8px;
+    }
+
+    .demo-gif img {
+        max-height: 20vh;
     }
 }
