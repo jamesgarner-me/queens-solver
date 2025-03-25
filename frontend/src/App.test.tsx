@@ -39,16 +39,16 @@ describe('App', () => {
     // Create test states
     let mockShowHint = vi.fn();
     let mockToggleReveal = vi.fn();
-    let mockSetRevealedColors = vi.fn();
-    let mockRevealedColors = new Set<number>();
+    let mockSetRevealedColours = vi.fn();
+    let mockRevealedColours = new Set<number>();
 
     beforeEach(() => {
         // Reset mocks before each test
         vi.resetAllMocks();
         mockShowHint = vi.fn();
         mockToggleReveal = vi.fn();
-        mockSetRevealedColors = vi.fn();
-        mockRevealedColors = new Set<number>();
+        mockSetRevealedColours = vi.fn();
+        mockRevealedColours = new Set<number>();
 
         // Default mock implementation for the useGameState hook
         vi.mocked(useGameState).mockReturnValue({
@@ -66,12 +66,12 @@ describe('App', () => {
                 [false, false, false, false, false, true, false, false],
             ],
             gridSize: 8,
-            revealedColors: mockRevealedColors,
+            revealedColours: mockRevealedColours,
             isRevealed: false,
             revealButtonLabel: 'Show Solution',
             showHint: mockShowHint,
             toggleReveal: mockToggleReveal,
-            setRevealedColors: mockSetRevealedColors,
+            setRevealedColours: mockSetRevealedColours,
         });
     });
 
@@ -102,12 +102,12 @@ describe('App', () => {
                 [false, false, false, false, false, true, false, false],
             ],
             gridSize: 8,
-            revealedColors: mockRevealedColors,
+            revealedColours: mockRevealedColours,
             isRevealed: false,
             revealButtonLabel: 'Show Solution',
             showHint: mockShowHint,
             toggleReveal: mockToggleReveal,
-            setRevealedColors: mockSetRevealedColors,
+            setRevealedColours: mockSetRevealedColours,
         });
 
         render(<App />);
@@ -139,12 +139,12 @@ describe('App', () => {
                 [false, false, false, false, false, true, false, false],
             ],
             gridSize: 8,
-            revealedColors: new Set([2, 0, 3, 1, 5, 6, 7, 4]), // All colors revealed
+            revealedColours: new Set([2, 0, 3, 1, 5, 6, 7, 4]), // All colours revealed
             isRevealed: true,
             revealButtonLabel: 'Hide Solution',
             showHint: mockShowHint,
             toggleReveal: mockToggleReveal,
-            setRevealedColors: mockSetRevealedColors,
+            setRevealedColours: mockSetRevealedColours,
         });
 
         // Rerender to simulate state update
@@ -177,7 +177,7 @@ describe('App', () => {
     it('disables hint button when all queens are revealed', async () => {
         const user = userEvent.setup();
 
-        // Mock all colors being revealed
+        // Mock all colours being revealed
         vi.mocked(useGameState).mockReturnValue({
             boardData: mockFetchResponse,
             loading: false,
@@ -193,12 +193,12 @@ describe('App', () => {
                 [false, false, false, false, false, true, false, false],
             ],
             gridSize: 8,
-            revealedColors: new Set([2, 0, 3, 1, 5, 6, 7, 4]), // All colors revealed
+            revealedColours: new Set([2, 0, 3, 1, 5, 6, 7, 4]), // All colours revealed
             isRevealed: true,
             revealButtonLabel: 'Hide Solution',
             showHint: mockShowHint,
             toggleReveal: mockToggleReveal,
-            setRevealedColors: mockSetRevealedColors,
+            setRevealedColours: mockSetRevealedColours,
         });
 
         render(<App />);

@@ -10,8 +10,8 @@ describe('Gameboard', () => {
             [2, 2, 2],
         ],
         colours: ['#BBA2E2', '#FFC992', '#96BEFF'],
-        revealedColors: new Set<number>(),
-        setRevealedColors: vi.fn(),
+        revealedColours: new Set<number>(),
+        setRevealedColours: vi.fn(),
         solution: [
             [true, false, false],
             [false, false, true],
@@ -34,7 +34,7 @@ describe('Gameboard', () => {
         // Click first cell (which has a queen in the solution)
         fireEvent.click(cells[0]);
 
-        expect(mockProps.setRevealedColors).toHaveBeenCalledWith(new Set([0]));
+        expect(mockProps.setRevealedColours).toHaveBeenCalledWith(new Set([0]));
     });
 
     it('shows all queens when isRevealed is true', () => {
@@ -48,19 +48,19 @@ describe('Gameboard', () => {
         expect(queens).toHaveLength(3); // There are 3 queens in the solution
     });
 
-    it('shows queens for revealed colors', () => {
-        const revealedColorProps = {
+    it('shows queens for revealed colours', () => {
+        const revealedColourProps = {
             ...mockProps,
-            revealedColors: new Set([0]), // Reveal color 0
+            revealedColours: new Set([0]), // Reveal colour 0
             solution: [
-                [true, false, false], // Only one queen in color region 0
+                [true, false, false], // Only one queen in colour region 0
                 [false, false, false],
                 [false, false, false],
             ],
         };
 
-        render(<Gameboard {...revealedColorProps} />);
+        render(<Gameboard {...revealedColourProps} />);
         const queens = screen.getAllByAltText('Queen');
-        expect(queens).toHaveLength(1); // Should show only one queen in color region 0
+        expect(queens).toHaveLength(1); // Should show only one queen in colour region 0
     });
 });

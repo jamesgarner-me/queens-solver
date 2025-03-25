@@ -21,12 +21,12 @@ describe('GamePage', () => {
             error: null,
             solution: undefined,
             gridSize: 0,
-            revealedColors: new Set(),
+            revealedColours: new Set(),
             isRevealed: false,
             revealButtonLabel: 'Show Solution',
             showHint: vi.fn(),
             toggleReveal: vi.fn(),
-            setRevealedColors: vi.fn(),
+            setRevealedColours: vi.fn(),
         });
 
         render(<GamePage />);
@@ -41,12 +41,12 @@ describe('GamePage', () => {
             error: 'Failed to load board data',
             solution: undefined,
             gridSize: 0,
-            revealedColors: new Set(),
+            revealedColours: new Set(),
             isRevealed: false,
             revealButtonLabel: 'Show Solution',
             showHint: vi.fn(),
             toggleReveal: vi.fn(),
-            setRevealedColors: vi.fn(),
+            setRevealedColours: vi.fn(),
         });
 
         render(<GamePage />);
@@ -93,12 +93,12 @@ describe('GamePage', () => {
                 [false, false, false, false, false, true, false, false],
             ],
             gridSize: 8,
-            revealedColors: new Set(),
+            revealedColours: new Set(),
             isRevealed: false,
             revealButtonLabel: 'Show Solution',
             showHint: vi.fn(),
             toggleReveal: vi.fn(),
-            setRevealedColors: vi.fn(),
+            setRevealedColours: vi.fn(),
         });
 
         render(<GamePage />);

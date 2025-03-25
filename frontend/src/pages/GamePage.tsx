@@ -5,7 +5,7 @@ import Loading from '../components/ui/Loading';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { useGameState } from '../hooks/useGameState';
 import { useModal } from '../context/ModalContext';
-import { BOARD_COLORS } from '../constants/colors';
+import { BOARD_COLOURS } from '../constants/colours';
 import queenIcon from '../assets/queen.svg';
 import './GamePage.css';
 
@@ -15,8 +15,8 @@ const GamePage: React.FC = () => {
         loading,
         error,
         solution,
-        revealedColors,
-        setRevealedColors,
+        revealedColours,
+        setRevealedColours,
         isRevealed,
         revealButtonLabel,
         showHint,
@@ -45,9 +45,9 @@ const GamePage: React.FC = () => {
             {boardData && solution && (
                 <Gameboard
                     board={boardData.board}
-                    colours={BOARD_COLORS}
-                    revealedColors={revealedColors}
-                    setRevealedColors={setRevealedColors}
+                    colours={BOARD_COLOURS}
+                    revealedColours={revealedColours}
+                    setRevealedColours={setRevealedColours}
                     solution={solution}
                     queenIcon={queenIcon}
                     isRevealed={isRevealed}
@@ -57,7 +57,7 @@ const GamePage: React.FC = () => {
             <div className="button-container">
                 <Button
                     onClick={showHint}
-                    disabled={!boardData || revealedColors.size >= (boardData?.solution.length ?? 0)}
+                    disabled={!boardData || revealedColours.size >= (boardData?.solution.length ?? 0)}
                     variant="primary"
                 >
                     Show hint ✨

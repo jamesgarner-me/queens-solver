@@ -8,12 +8,12 @@ interface GameState {
     error: string | null;
     solution: SolutionType | undefined;
     gridSize: number;
-    revealedColors: Set<number>;
+    revealedColours: Set<number>;
     isRevealed: boolean;
     revealButtonLabel: string;
     showHint: () => void;
     toggleReveal: () => void;
-    setRevealedColors: React.Dispatch<React.SetStateAction<Set<number>>>;
+    setRevealedColours: React.Dispatch<React.SetStateAction<Set<number>>>;
 }
 
 export const useGameState = (): GameState => {
@@ -23,7 +23,7 @@ export const useGameState = (): GameState => {
     const [error, setError] = useState<string | null>(null);
     const [gridSize, setGridSize] = useState<number>(0);
     const [solution, setSolution] = useState<SolutionType>();
-    const [revealedColors, setRevealedColors] = useState<Set<number>>(new Set());
+    const [revealedColours, setRevealedColours] = useState<Set<number>>(new Set());
     const [isRevealed, setIsRevealed] = useState(false);
     const [revealButtonLabel, setRevealButtonLabel] = useState('Show Solution');
 
@@ -67,33 +67,33 @@ export const useGameState = (): GameState => {
 
     // Auto-reveal all queens when all hints have been shown
     useEffect(() => {
-        if (boardData && revealedColors.size >= boardData.solution.length) {
+        if (boardData && revealedColours.size >= boardData.solution.length) {
             setIsRevealed(true);
             setRevealButtonLabel('Hide Solution');
         }
-    }, [revealedColors, boardData]);
+    }, [revealedColours, boardData]);
 
     // Show a hint by revealing one queen
     const showHint = () => {
         if (!boardData || !solution) return;
 
-        // Find the next color region that doesn't have a queen revealed
-        const colorRegions = new Map<number, { row: number; col: number }>();
+        // Find the next colour region that doesn't have a queen revealed
+        const colourRegions = new Map<number, { row: number; col: number }>();
 
-        // Map each color to its queen position
+        // Map each colour to its queen position
         boardData.board.forEach((row, rowIndex) => {
-            row.forEach((colorIndex, colIndex) => {
+            row.forEach((colourIndex, colIndex) => {
                 if (solution[rowIndex][colIndex]) {
-                    colorRegions.set(colorIndex, { row: rowIndex, col: colIndex });
+                    colourRegions.set(colourIndex, { row: rowIndex, col: colIndex });
                 }
             });
         });
 
-        // Find first unrevealed color region
-        for (const [colorIndex, _] of colorRegions) {
-            if (!revealedColors.has(colorIndex)) {
-                const newRevealedColors = new Set([...revealedColors, colorIndex]);
-                setRevealedColors(newRevealedColors);
+        // Find first unrevealed colour region
+        for (const [colourIndex, _] of colourRegions) {
+            if (!revealedColours.has(colourIndex)) {
+                const newRevealedColours = new Set([...revealedColours, colourIndex]);
+                setRevealedColours(newRevealedColours);
                 return;
             }
         }
@@ -105,24 +105,24 @@ export const useGameState = (): GameState => {
         setIsRevealed(newIsRevealed);
         setRevealButtonLabel(newIsRevealed ? 'Hide Solution' : 'Show Solution');
 
-        // If revealing solution, mark all colors as revealed
+        // If revealing solution, mark all colours as revealed
         if (newIsRevealed && boardData && boardData.solution) {
-            // Collect all color indexes that have queens
-            const colorsWithQueens = new Set<number>();
+            // Collect all colour indexes that have queens
+            const coloursWithQueens = new Set<number>();
             if (solution) {
                 boardData.board.forEach((row, rowIndex) => {
-                    row.forEach((colorIndex, colIndex) => {
+                    row.forEach((colourIndex, colIndex) => {
                         if (solution[rowIndex][colIndex]) {
-                            colorsWithQueens.add(colorIndex);
+                            coloursWithQueens.add(colourIndex);
                         }
                     });
                 });
             }
-            setRevealedColors(colorsWithQueens);
+            setRevealedColours(coloursWithQueens);
         }
-        // Reset revealed colors when hiding
+        // Reset revealed colours when hiding
         else if (!newIsRevealed) {
-            setRevealedColors(new Set());
+            setRevealedColours(new Set());
         }
     };
 
@@ -132,11 +132,11 @@ export const useGameState = (): GameState => {
         error,
         solution,
         gridSize,
-        revealedColors,
+        revealedColours,
         isRevealed,
         revealButtonLabel,
         showHint,
         toggleReveal,
-        setRevealedColors,
+        setRevealedColours,
     };
 };

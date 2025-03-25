@@ -1,4 +1,4 @@
-export const BOARD_COLORS = [
+export const BOARD_COLOURS = [
     '#BBA2E2', // 0
     '#FFC992', // 1
     '#96BEFF', // 2
@@ -15,5 +15,4 @@ export const BOARD_COLORS = [
     '#F0E68C', // 13
     '#ADD8E6', // 14
     '#F08080', // 15
-    // Add more colors as needed for larger boards
 ];

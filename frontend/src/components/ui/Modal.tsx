@@ -18,7 +18,7 @@ const InstructionModal: React.FC = () => {
                     <ul>
                         <li>
                             <span className="instruction-number">1</span>
-                            <p>Click on a colored region to find a queen. Each color contains exactly one queen.</p>
+                            <p>Click on a coloured region to reveal the location of the queen in that region.</p>
                         </li>
                         <li>
                             <span className="instruction-number">2</span>
@@ -31,17 +31,18 @@ const InstructionModal: React.FC = () => {
                     </ul>
                 </div>
 
-                <div className="demo-container">
-                    <p className="demo-text">Watch how the game works:</p>
-                    <div className="demo-placeholder">
-                        <p>Placeholder for gameplay demonstration GIF/MP4</p>
-                        <div className="placeholder-dimensions">(400px × 300px recommended)</div>
-                    </div>
+                <div className="demo-gif">
+                    <img
+                        src="/queens-solve-howto.gif"
+                        alt="Queens Solver gameplay demonstration"
+                        width="100%"
+                        height="auto"
+                    />
                 </div>
 
                 <div className="modal-footer">
                     <Button onClick={closeModal} variant="primary">
-                        OK
+                        Dismiss
                     </Button>
                 </div>
             </div>

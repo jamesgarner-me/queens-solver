@@ -24,8 +24,8 @@ describe('Gameboard', () => {
             '#E6F388', // 6
             '#B9B29E', // 7
         ],
-        revealedColors: new Set<number>(),
-        setRevealedColors: vi.fn(),
+        revealedColours: new Set<number>(),
+        setRevealedColours: vi.fn(),
         solution: [
             [false, false, true, false, false, false, false, false],
             [false, false, false, false, false, false, false, true],
@@ -53,7 +53,7 @@ describe('Gameboard', () => {
         // Click a cell in region 2 which has a queen (row 0, col 2)
         fireEvent.click(cells[2]); // First row, third cell
 
-        expect(mockProps.setRevealedColors).toHaveBeenCalledWith(new Set([2]));
+        expect(mockProps.setRevealedColours).toHaveBeenCalledWith(new Set([2]));
     });
 
     it('shows all queens when isRevealed is true', () => {

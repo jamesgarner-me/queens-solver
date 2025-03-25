@@ -5,8 +5,8 @@ import './Gameboard.css';
 interface GameboardProps {
     board: number[][];
     colours: string[];
-    revealedColors: Set<number>;
-    setRevealedColors: React.Dispatch<React.SetStateAction<Set<number>>>;
+    revealedColours: Set<number>;
+    setRevealedColours: React.Dispatch<React.SetStateAction<Set<number>>>;
     solution: boolean[][];
     queenIcon: string;
     isRevealed: boolean;
@@ -15,8 +15,8 @@ interface GameboardProps {
 const Gameboard: React.FC<GameboardProps> = ({
     board,
     colours,
-    revealedColors,
-    setRevealedColors,
+    revealedColours,
+    setRevealedColours,
     solution,
     queenIcon,
     isRevealed,
@@ -38,16 +38,16 @@ const Gameboard: React.FC<GameboardProps> = ({
     };
 
     const handleCellClick = (row: number, col: number) => {
-        const colorIndex = board[row][col];
+        const colourIndex = board[row][col];
 
-        // If this color hasn't been revealed yet
-        if (!revealedColors.has(colorIndex)) {
-            // Find the queen position for this color region
+        // If this colour hasn't been revealed yet
+        if (!revealedColours.has(colourIndex)) {
+            // Find the queen position for this colour region
             for (let i = 0; i < board.length; i++) {
                 for (let j = 0; j < board[i].length; j++) {
-                    if (board[i][j] === colorIndex && solution[i][j]) {
-                        // Add this color to revealed colors
-                        setRevealedColors(new Set([...revealedColors, colorIndex]));
+                    if (board[i][j] === colourIndex && solution[i][j]) {
+                        // Add this colour to revealed colours
+                        setRevealedColours(new Set([...revealedColours, colourIndex]));
                         return;
                     }
                 }
@@ -64,12 +64,12 @@ const Gameboard: React.FC<GameboardProps> = ({
                             key={`${rowIndex}-${colIndex}`}
                             className={`cell ${getCellClass(rowIndex, colIndex)}`}
                             style={{
-                                backgroundColor: colours[cell] || 'transparent',
+                                backgroundColour: colours[cell] || 'transparent',
                                 cursor: 'pointer',
                             }}
                             onClick={() => handleCellClick(rowIndex, colIndex)}
                         >
-                            {solution[rowIndex][colIndex] && (isRevealed || revealedColors.has(cell)) && (
+                            {solution[rowIndex][colIndex] && (isRevealed || revealedColours.has(cell)) && (
                                 <img src={queenIcon} alt="Queen" className="queen-icon" />
                             )}
                         </div>
