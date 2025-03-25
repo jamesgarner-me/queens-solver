@@ -8,9 +8,14 @@ import Footer from './components/ui/Footer';
 function App() {
     return (
         <ModalProvider>
+            <a href="#main-content" className="skip-link">
+                Skip to main content
+            </a>
             <InstructionModal />
             <MainLayout>
-                <GamePage />
+                <div id="main-content" tabIndex={-1}>
+                    <GamePage />
+                </div>
                 <Footer />
             </MainLayout>
         </ModalProvider>

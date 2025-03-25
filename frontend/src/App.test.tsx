@@ -83,6 +83,13 @@ describe('App', () => {
         expect(puzzleId).toBeInTheDocument();
     });
 
+    it('renders skip link for accessibility', () => {
+        render(<App />);
+        const skipLink = screen.getByText('Skip to main content');
+        expect(skipLink).toBeInTheDocument();
+        expect(skipLink).toHaveAttribute('href', '#main-content');
+    });
+
     it('toggles solution visibility when reveal button is clicked', async () => {
         const user = userEvent.setup();
 
@@ -112,9 +119,9 @@ describe('App', () => {
 
         render(<App />);
 
-        // Find the button
+        // Find the button using ARIA label
         const revealButton = await screen.findByRole('button', {
-            name: /show solution/i,
+            name: /show all queens/i,
         });
 
         // Click to reveal
@@ -152,7 +159,7 @@ describe('App', () => {
 
         // Verify button text changed
         const hideButton = await screen.findByRole('button', {
-            name: /hide solution/i,
+            name: /hide all queens/i,
         });
         expect(hideButton).toHaveTextContent('Hide Solution');
     });
@@ -162,9 +169,9 @@ describe('App', () => {
 
         render(<App />);
 
-        // Find the button
+        // Find the button using ARIA label
         const hintButton = await screen.findByRole('button', {
-            name: /show hint/i,
+            name: /show a hint/i,
         });
 
         // Click hint button
@@ -205,7 +212,7 @@ describe('App', () => {
 
         // Find the hint button
         const hintButton = await screen.findByRole('button', {
-            name: /show hint/i,
+            name: /show a hint/i,
         });
 
         // Verify it's disabled

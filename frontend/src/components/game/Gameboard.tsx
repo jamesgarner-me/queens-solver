@@ -55,10 +55,17 @@ const Gameboard: React.FC<GameboardProps> = ({
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent, row: number, col: number) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleCellClick(row, col);
+        }
+    };
+
     return (
-        <div className="gameboard">
+        <div className="gameboard" role="grid" aria-label="Queens Puzzle Board">
             {board.map((row, rowIndex) => (
-                <div key={rowIndex} className="row">
+                <div key={rowIndex} className="row" role="row">
                     {row.map((cell, colIndex) => (
                         <div
                             key={`${rowIndex}-${colIndex}`}
@@ -68,9 +75,17 @@ const Gameboard: React.FC<GameboardProps> = ({
                                 cursor: 'pointer',
                             }}
                             onClick={() => handleCellClick(rowIndex, colIndex)}
+                            onKeyDown={(e) => handleKeyDown(e, rowIndex, colIndex)}
+                            role="gridcell"
+                            tabIndex={0}
+                            aria-label={`Cell at row ${rowIndex + 1}, column ${colIndex + 1}${
+                                solution[rowIndex][colIndex] && (isRevealed || revealedColours.has(cell))
+                                    ? ', contains a queen'
+                                    : ''
+                            }`}
                         >
                             {solution[rowIndex][colIndex] && (isRevealed || revealedColours.has(cell)) && (
-                                <img src={queenIcon} alt="Queen" className="queen-icon" />
+                                <img src={queenIcon} alt="" className="queen-icon" aria-hidden="true" />
                             )}
                         </div>
                     ))}

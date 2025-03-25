@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Gameboard from './Gameboard';
 
 describe('Gameboard', () => {
@@ -23,16 +24,17 @@ describe('Gameboard', () => {
 
     it('renders the board with correct number of cells', () => {
         render(<Gameboard {...mockProps} />);
-        const cells = document.getElementsByClassName('cell');
+        const cells = screen.getAllByRole('gridcell');
         expect(cells.length).toBe(9); // 3x3 board
     });
 
-    it('shows queen when clicking a cell in correct region', () => {
+    it('shows queen when clicking a cell in correct region', async () => {
+        const user = userEvent.setup();
         render(<Gameboard {...mockProps} />);
-        const cells = document.getElementsByClassName('cell');
+        const cells = screen.getAllByRole('gridcell');
 
         // Click first cell (which has a queen in the solution)
-        fireEvent.click(cells[0]);
+        await user.click(cells[0]);
 
         expect(mockProps.setRevealedColours).toHaveBeenCalledWith(new Set([0]));
     });
@@ -44,7 +46,7 @@ describe('Gameboard', () => {
         };
 
         render(<Gameboard {...revealedProps} />);
-        const queens = screen.getAllByAltText('Queen');
+        const queens = document.querySelectorAll('.queen-icon');
         expect(queens).toHaveLength(3); // There are 3 queens in the solution
     });
 
@@ -60,7 +62,19 @@ describe('Gameboard', () => {
         };
 
         render(<Gameboard {...revealedColourProps} />);
-        const queens = screen.getAllByAltText('Queen');
+        const queens = document.querySelectorAll('.queen-icon');
         expect(queens).toHaveLength(1); // Should show only one queen in colour region 0
+    });
+
+    it('supports keyboard interaction for cell selection', async () => {
+        const user = userEvent.setup();
+        render(<Gameboard {...mockProps} />);
+        const cells = screen.getAllByRole('gridcell');
+
+        // Tab to the first cell and press Enter
+        await user.tab(); // First focusable element
+        await user.keyboard('{Enter}');
+
+        expect(mockProps.setRevealedColours).toHaveBeenCalledWith(new Set([0]));
     });
 });

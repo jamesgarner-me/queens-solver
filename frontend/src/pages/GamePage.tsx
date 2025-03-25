@@ -33,25 +33,39 @@ const GamePage: React.FC = () => {
         return <ErrorMessage message={error} />;
     }
 
+    const totalQueens = boardData?.solution.length ?? 0;
+    const revealedQueens = revealedColours.size;
+    const remainingQueens = totalQueens - revealedQueens;
+
     return (
-        <div className="game-container">
-            <div className="header-row">
-                <div className="puzzle-label">{boardData ? `Puzzle ID: ${boardData.puzzleId}` : 'No puzzle data'}</div>
-                <button className="instruction-button" onClick={openModal}>
+        <main className="game-container">
+            <header className="header-row">
+                <div className="puzzle-label" aria-live="polite">
+                    {boardData ? `Puzzle ID: ${boardData.puzzleId}` : 'No puzzle data'}
+                </div>
+                <button className="instruction-button" onClick={openModal} aria-label="Open how to play instructions">
                     How to Play
                 </button>
-            </div>
+            </header>
 
             {boardData && solution && (
-                <Gameboard
-                    board={boardData.board}
-                    colours={BOARD_COLOURS}
-                    revealedColours={revealedColours}
-                    setRevealedColours={setRevealedColours}
-                    solution={solution}
-                    queenIcon={queenIcon}
-                    isRevealed={isRevealed}
-                />
+                <>
+                    <Gameboard
+                        board={boardData.board}
+                        colours={BOARD_COLOURS}
+                        revealedColours={revealedColours}
+                        setRevealedColours={setRevealedColours}
+                        solution={solution}
+                        queenIcon={queenIcon}
+                        isRevealed={isRevealed}
+                    />
+
+                    <div aria-live="polite" className="visually-hidden">
+                        {isRevealed
+                            ? 'All queens revealed.'
+                            : `${revealedQueens} out of ${totalQueens} queens revealed. ${remainingQueens} remaining.`}
+                    </div>
+                </>
             )}
 
             <div className="button-container">
@@ -59,15 +73,21 @@ const GamePage: React.FC = () => {
                     onClick={showHint}
                     disabled={!boardData || revealedColours.size >= (boardData?.solution.length ?? 0)}
                     variant="primary"
+                    ariaLabel="Show a hint by revealing one queen"
                 >
                     Show hint ✨
                 </Button>
 
-                <Button onClick={toggleReveal} disabled={!boardData} variant="secondary">
+                <Button
+                    onClick={toggleReveal}
+                    disabled={!boardData}
+                    variant="secondary"
+                    ariaLabel={isRevealed ? 'Hide all queens' : 'Show all queens'}
+                >
                     {revealButtonLabel}
                 </Button>
             </div>
-        </div>
+        </main>
     );
 };
 
