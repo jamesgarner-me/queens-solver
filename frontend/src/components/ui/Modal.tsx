@@ -9,9 +9,18 @@ const InstructionModal: React.FC = () => {
     const buttonContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // Focus the button container when modal opens
+        // When modal opens, ensure mouse mode is active and focus without visible outline
         if (isModalOpen && buttonContainerRef.current) {
-            buttonContainerRef.current.focus();
+            // Make sure we're in mouse mode before focusing to prevent outline
+            document.body.classList.remove('using-keyboard');
+            document.body.classList.add('using-mouse');
+
+            // Focus after a short delay to ensure classes are applied
+            setTimeout(() => {
+                if (buttonContainerRef.current) {
+                    buttonContainerRef.current.focus();
+                }
+            }, 10);
         }
 
         // Restore focus when modal closes

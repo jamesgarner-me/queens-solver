@@ -12,10 +12,17 @@
     white-space: nowrap;
 }
 
-/* Focus styles for keyboard navigation */
-:focus {
-    outline: 2px solid #4d90fe;
-    outline-offset: 2px;
+/* Focus styles based on input method detection */
+
+/* Hide focus styles when using mouse */
+.using-mouse :focus {
+    outline: none !important;
+}
+
+/* Show focus styles when using keyboard */
+.using-keyboard :focus {
+    outline: 2px solid #4d90fe !important;
+    outline-offset: 2px !important;
 }
 
 /* Skip navigation link - becomes visible on focus */
