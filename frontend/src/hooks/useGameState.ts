@@ -25,7 +25,7 @@ export const useGameState = (): GameState => {
     const [solution, setSolution] = useState<SolutionType>();
     const [revealedColors, setRevealedColors] = useState<Set<number>>(new Set());
     const [isRevealed, setIsRevealed] = useState(false);
-    const [revealButtonLabel, setRevealButtonLabel] = useState('Reveal Solution');
+    const [revealButtonLabel, setRevealButtonLabel] = useState('Show Solution');
 
     // Fetch board data on component mount
     useEffect(() => {
@@ -103,7 +103,7 @@ export const useGameState = (): GameState => {
     const toggleReveal = () => {
         const newIsRevealed = !isRevealed;
         setIsRevealed(newIsRevealed);
-        setRevealButtonLabel(newIsRevealed ? 'Hide Solution' : 'Reveal Solution');
+        setRevealButtonLabel(newIsRevealed ? 'Hide Solution' : 'Show Solution');
 
         // If revealing solution, mark all colors as revealed
         if (newIsRevealed && boardData && boardData.solution) {

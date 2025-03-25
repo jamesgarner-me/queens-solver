@@ -23,7 +23,7 @@ describe('GamePage', () => {
             gridSize: 0,
             revealedColors: new Set(),
             isRevealed: false,
-            revealButtonLabel: 'Reveal Solution',
+            revealButtonLabel: 'Show Solution',
             showHint: vi.fn(),
             toggleReveal: vi.fn(),
             setRevealedColors: vi.fn(),
@@ -43,7 +43,7 @@ describe('GamePage', () => {
             gridSize: 0,
             revealedColors: new Set(),
             isRevealed: false,
-            revealButtonLabel: 'Reveal Solution',
+            revealButtonLabel: 'Show Solution',
             showHint: vi.fn(),
             toggleReveal: vi.fn(),
             setRevealedColors: vi.fn(),
@@ -95,7 +95,7 @@ describe('GamePage', () => {
             gridSize: 8,
             revealedColors: new Set(),
             isRevealed: false,
-            revealButtonLabel: 'Reveal Solution',
+            revealButtonLabel: 'Show Solution',
             showHint: vi.fn(),
             toggleReveal: vi.fn(),
             setRevealedColors: vi.fn(),
@@ -104,6 +104,6 @@ describe('GamePage', () => {
         render(<GamePage />);
         expect(screen.getByText('Puzzle ID: 269')).toBeInTheDocument();
         expect(screen.getByText('Show hint ✨')).toBeInTheDocument();
-        expect(screen.getByText('Reveal Solution')).toBeInTheDocument();
+        expect(screen.getByText('Show Solution')).toBeInTheDocument();
     });
 });

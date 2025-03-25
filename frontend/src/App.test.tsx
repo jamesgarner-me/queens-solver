@@ -68,7 +68,7 @@ describe('App', () => {
             gridSize: 8,
             revealedColors: mockRevealedColors,
             isRevealed: false,
-            revealButtonLabel: 'Reveal Solution',
+            revealButtonLabel: 'Show Solution',
             showHint: mockShowHint,
             toggleReveal: mockToggleReveal,
             setRevealedColors: mockSetRevealedColors,
@@ -104,7 +104,7 @@ describe('App', () => {
             gridSize: 8,
             revealedColors: mockRevealedColors,
             isRevealed: false,
-            revealButtonLabel: 'Reveal Solution',
+            revealButtonLabel: 'Show Solution',
             showHint: mockShowHint,
             toggleReveal: mockToggleReveal,
             setRevealedColors: mockSetRevealedColors,
@@ -114,7 +114,7 @@ describe('App', () => {
 
         // Find the button
         const revealButton = await screen.findByRole('button', {
-            name: /reveal solution/i,
+            name: /show solution/i,
         });
 
         // Click to reveal

@@ -26,7 +26,7 @@ const InstructionModal: React.FC = () => {
                         </li>
                         <li>
                             <span className="instruction-number">3</span>
-                            <p>Use the "Reveal Solution" button to see all queens at once, or hide them again.</p>
+                            <p>Use the "Show Solution" button to see all queens at once, or hide them again.</p>
                         </li>
                     </ul>
                 </div>

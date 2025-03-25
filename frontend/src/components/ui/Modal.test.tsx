@@ -41,7 +41,7 @@ describe('InstructionModal', () => {
         // Check for instruction points
         expect(screen.getByText(/Click on a colored region/i)).toBeInTheDocument();
         expect(screen.getByText(/Use the "Show hint" button/i)).toBeInTheDocument();
-        expect(screen.getByText(/Use the "Reveal Solution" button/i)).toBeInTheDocument();
+        expect(screen.getByText(/Use the "Show Solution" button/i)).toBeInTheDocument();
 
         // Check for placeholder
         expect(screen.getByText(/Placeholder for gameplay demonstration/i)).toBeInTheDocument();
