@@ -14,13 +14,34 @@
     align-items: center;
 }
 
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
 .puzzle-label {
     font-size: 1.2em;
     color: #000;
     font-weight: bold;
-    margin-bottom: 16px;
-    width: 100%;
-    text-align: center;
+}
+
+.instruction-button {
+    background: none;
+    border: none;
+    color: #44266c;
+    font-size: 0.9em;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.instruction-button:hover {
+    background-color: rgba(68, 38, 108, 0.1);
 }
 
 .button-container {
@@ -42,5 +63,14 @@
 
     .button-container button {
         margin: 5px 0;
+    }
+
+    .header-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .instruction-button {
+        margin-top: 5px;
     }
 }

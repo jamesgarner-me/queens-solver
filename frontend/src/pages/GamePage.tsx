@@ -4,6 +4,7 @@ import Button from '../components/ui/Button';
 import Loading from '../components/ui/Loading';
 import ErrorMessage from '../components/ui/ErrorMessage';
 import { useGameState } from '../hooks/useGameState';
+import { useModal } from '../context/ModalContext';
 import { BOARD_COLORS } from '../constants/colors';
 import queenIcon from '../assets/queen.svg';
 import './GamePage.css';
@@ -22,6 +23,8 @@ const GamePage: React.FC = () => {
         toggleReveal,
     } = useGameState();
 
+    const { openModal } = useModal();
+
     if (loading) {
         return <Loading message="Loading puzzle..." />;
     }
@@ -32,7 +35,12 @@ const GamePage: React.FC = () => {
 
     return (
         <div className="game-container">
-            <div className="puzzle-label">{boardData ? `Puzzle ID: ${boardData.puzzleId}` : 'No puzzle data'}</div>
+            <div className="header-row">
+                <div className="puzzle-label">{boardData ? `Puzzle ID: ${boardData.puzzleId}` : 'No puzzle data'}</div>
+                <button className="instruction-button" onClick={openModal}>
+                    How to Play
+                </button>
+            </div>
 
             {boardData && solution && (
                 <Gameboard
