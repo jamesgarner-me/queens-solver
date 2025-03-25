@@ -11,5 +11,6 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    padding-bottom: calc(20px + 2.5rem); /* Add extra padding at the bottom for the footer */
     background: linear-gradient(135deg, #705296, #44266c);
 }
