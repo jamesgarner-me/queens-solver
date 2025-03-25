@@ -115,7 +115,15 @@ describe('GamePage', () => {
         });
 
         render(<GamePage />);
-        expect(screen.getByText('Puzzle ID: 269')).toBeInTheDocument();
+        expect(screen.getByText('Puzzle ID:')).toBeInTheDocument();
+
+        // Check the link with puzzle ID
+        const puzzleIdLink = screen.getByText('269');
+        expect(puzzleIdLink).toBeInTheDocument();
+        expect(puzzleIdLink.tagName).toBe('A');
+        expect(puzzleIdLink).toHaveAttribute('href', 'https://www.linkedin.com/games/queens');
+        expect(puzzleIdLink).toHaveAttribute('target', '_blank');
+
         expect(screen.getByText('Show hint ✨')).toBeInTheDocument();
         expect(screen.getByText('Show Solution')).toBeInTheDocument();
     });

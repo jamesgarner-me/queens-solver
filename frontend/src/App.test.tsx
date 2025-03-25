@@ -78,8 +78,7 @@ describe('App', () => {
     it('renders puzzle ID after loading', async () => {
         render(<App />);
 
-        // Our app structure now shows "Puzzle ID: 123" instead of "PuzzleId: 123"
-        const puzzleId = await screen.findByText('Puzzle ID: 123');
+        const puzzleId = await screen.findByText('Puzzle ID:');
         expect(puzzleId).toBeInTheDocument();
     });
 

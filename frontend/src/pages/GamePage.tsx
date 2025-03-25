@@ -41,7 +41,21 @@ const GamePage: React.FC = () => {
         <main className="game-container">
             <header className="header-row">
                 <div className="puzzle-label" aria-live="polite">
-                    {boardData ? `Puzzle ID: ${boardData.puzzleId}` : 'No puzzle data'}
+                    {boardData ? (
+                        <>
+                            Puzzle ID:{' '}
+                            <a
+                                href="https://www.linkedin.com/games/queens"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label={`Visit LinkedIn Queens puzzle ${boardData.puzzleId}`}
+                            >
+                                {boardData.puzzleId}
+                            </a>
+                        </>
+                    ) : (
+                        'No puzzle data'
+                    )}
                 </div>
                 <button className="instruction-button" onClick={openModal} aria-label="Open how to use instructions">
                     How to use
