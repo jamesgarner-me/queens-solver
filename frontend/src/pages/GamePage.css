@@ -49,6 +49,20 @@
     justify-content: center;
     margin-top: 16px;
     gap: 10px;
+    width: 100%;
+}
+
+.button-container .button {
+    min-width: 170px;
+    width: auto;
+}
+
+.button-container .button.secondary {
+    background-color: #44266c;
+}
+
+.button-container .button.secondary:hover {
+    background-color: #573884;
 }
 
 @media (max-width: 600px) {
