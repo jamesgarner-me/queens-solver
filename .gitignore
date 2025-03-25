@@ -1,0 +1,8 @@
+.DS_Store
+.vscode
+deployment-package
+*.zip
+
+# Include subdirectory gitignore files
+!backend/.gitignore
+!frontend/.gitignore
