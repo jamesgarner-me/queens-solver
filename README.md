@@ -6,7 +6,7 @@ I created this personal project mainly to explore the use of AI assisted coding 
 
 ## Background
 
-This project solves LinkedIn's [Queens puzzle](https://www.linkedin.com/games/queens) of the day.
+This project solves LinkedIn's [Queens puzzle](https://www.linkedin.com/games/queens){:target="\_blank"} of the day.
 
 ## Tech Stack
 
