@@ -1,6 +1,6 @@
 import logging
 import requests
-from ..config import GAME_BASE_URL, API_BASE_URL, LOG_FORMAT, LOG_LEVEL, QUERY_STRING
+from config import GAME_BASE_URL, API_BASE_URL, LOG_FORMAT, LOG_LEVEL, QUERY_STRING
 
 # Set up logging
 logging.basicConfig(level=getattr(logging, LOG_LEVEL), format=LOG_FORMAT)

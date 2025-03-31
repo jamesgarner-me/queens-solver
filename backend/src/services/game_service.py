@@ -1,5 +1,5 @@
-from ..utils.board_solver import solve_board
-from ..services.api_service import fetch_csrf_token, make_api_request
+from utils.board_solver import solve_board
+from services.api_service import fetch_csrf_token, make_api_request
 
 
 def parse_game(api_response):
