@@ -15,7 +15,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             CodeUri: src/
-            Handler: main.handler
+            Handler: lambda_function.handler
             Events:
                 ApiEvent:
                     Type: Api
