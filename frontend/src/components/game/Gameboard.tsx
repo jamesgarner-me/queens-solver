@@ -1,6 +1,6 @@
 import React from 'react';
 import './Gameboard.css';
-import { BoardType, SolutionType } from '../../types/gameTypes';
+import { BoardType } from '../../types/gameTypes';
 
 interface GameboardProps {
     board: BoardType;

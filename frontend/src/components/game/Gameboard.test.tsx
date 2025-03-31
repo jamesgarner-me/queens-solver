@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Gameboard from './Gameboard';
+import { renderHook } from '@testing-library/react';
+import { useGameState } from '../../contexts/GameStateContext';
 
 describe('Gameboard', () => {
     const mockProps = {

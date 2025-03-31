@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import useInstructionModal from './useInstructionModal';
+import { useInstructionModal } from './useInstructionModal';
 
 describe('useInstructionModal', () => {
     it('should initialize with modal open', () => {

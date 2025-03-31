@@ -1,7 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, renderHook, act } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ModalProvider, useModal } from './ModalContext';
-import React from 'react';
 
 // Test component that uses the modal context
 const TestComponent = () => {
