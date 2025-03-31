@@ -52,7 +52,6 @@ jobs:
 
             - name: Create deployment package
               run: |
-                  cd backend
                   rm -rf deployment-package
                   mkdir -p deployment-package/package
                   cp -r src/* deployment-package/
