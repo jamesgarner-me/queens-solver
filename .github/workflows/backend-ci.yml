@@ -57,11 +57,13 @@ jobs:
 
             - name: Create deployment package
               run: |
-                  mkdir -p deployment
+                  mkdir -p deployment/package
                   cp -r src/* deployment/
-                  cp requirements.txt deployment/
-                  cd deployment
-                  zip -r ../function.zip .
+                  cd deployment/package
+                  pip install -r ../../requirements.txt -t .
+                  cd ..
+                  zip -r ../function.zip package/
+                  zip function.zip lambda_function.py
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
