@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+    Function:
+        Timeout: 30
+        Runtime: python3.9
+        MemorySize: 256
+        Environment:
+            Variables:
+                ALLOWED_ORIGINS: "https://your-cloudfront-domain.cloudfront.net"
+
+Resources:
+    QueensSolverFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: src/
+            Handler: main.handler
+            Events:
+                ApiEvent:
+                    Type: Api
+                    Properties:
+                        Path: /boards/latest
+                        Method: get
+                        RestApiId: !Ref QueensSolverApi
+            Policies:
+                - AWSLambdaBasicExecutionRole
+                - Statement:
+                      - Effect: Allow
+                        Action:
+                            - logs:CreateLogGroup
+                            - logs:CreateLogStream
+                            - logs:PutLogEvents
+                        Resource: "*"
+
+    QueensSolverApi:
+        Type: AWS::Serverless::Api
+        Properties:
+            StageName: prod
+            Cors:
+                AllowMethods: "'GET'"
+                AllowHeaders: "'*'"
+                AllowOrigin: "'https://your-cloudfront-domain.cloudfront.net'"
+                MaxAge: "'300'"
+
+Outputs:
+    QueensSolverApi:
+        Description: "API Gateway endpoint URL for Prod stage"
+        Value: !Sub "https://${QueensSolverApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    QueensSolverFunction:
+        Description: "Queens Solver Lambda Function ARN"
+        Value: !GetAtt QueensSolverFunction.Arn

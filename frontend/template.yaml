@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Frontend infrastructure for Queens Solver'
+
+Resources:
+    QueensSolverBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: !Sub ${AWS::StackName}-frontend
+            # Remove public access configuration since we're using OAI
+            WebsiteConfiguration:
+                IndexDocument: index.html
+                ErrorDocument: index.html
+
+    QueensSolverBucketPolicy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+            Bucket: !Ref QueensSolverBucket
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Sid: AllowCloudFrontAccess
+                      Effect: Allow
+                      Principal:
+                          CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+                      Action: 's3:GetObject'
+                      Resource: !Join ['', [!GetAtt QueensSolverBucket.Arn, '/*']]
+
+    QueensSolverDistribution:
+        Type: AWS::CloudFront::Distribution
+        Properties:
+            DistributionConfig:
+                Enabled: true
+                DefaultRootObject: index.html
+                Origins:
+                    - DomainName: !GetAtt QueensSolverBucket.RegionalDomainName
+                      Id: S3Origin
+                      S3OriginConfig:
+                          OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+                DefaultCacheBehavior:
+                    TargetOriginId: S3Origin
+                    ViewerProtocolPolicy: redirect-to-https
+                    AllowedMethods:
+                        - GET
+                        - HEAD
+                    CachedMethods:
+                        - GET
+                        - HEAD
+                    ForwardedValues:
+                        QueryString: false
+                        Cookies:
+                            Forward: none
+                CustomErrorResponses:
+                    - ErrorCode: 403
+                      ResponsePagePath: /index.html
+                      ResponseCode: 200
+                    - ErrorCode: 404
+                      ResponsePagePath: /index.html
+                      ResponseCode: 200
+
+    CloudFrontOriginAccessIdentity:
+        Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+        Properties:
+            CloudFrontOriginAccessIdentityConfig:
+                Comment: !Sub ${AWS::StackName}-OAI
+
+Outputs:
+    BucketName:
+        Description: Name of S3 bucket
+        Value: !Ref QueensSolverBucket
+    CloudFrontURL:
+        Description: URL for website hosted on CloudFront
+        Value: !Sub https://${QueensSolverDistribution.DomainName}

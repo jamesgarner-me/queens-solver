@@ -1,0 +1,76 @@
+name: Backend CI/CD
+
+on:
+    push:
+        branches: [main]
+        paths:
+            - "backend/**"
+    pull_request:
+        branches: [main]
+        paths:
+            - "backend/**"
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.9"
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+
+            - name: Run tests
+              run: python -m unittest tests.py
+
+    deploy:
+        needs: test
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.9"
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+
+            - name: Create deployment package
+              run: |
+                  mkdir -p deployment
+                  cp -r src deployment/
+                  cp requirements.txt deployment/
+                  cd deployment
+                  zip -r ../function.zip .
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Update Lambda function
+              run: |
+                  aws lambda update-function-code \
+                    --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+                    --zip-file fileb://function.zip
