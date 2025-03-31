@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
-from .config import ALLOWED_ORIGINS
-from .services.game_service import get_latest_game
+from config import ALLOWED_ORIGINS
+from services.game_service import get_latest_game
 
 app = FastAPI()
 
