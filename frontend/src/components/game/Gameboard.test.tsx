@@ -2,8 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Gameboard from './Gameboard';
-import { renderHook } from '@testing-library/react';
-import { useGameState } from '../../contexts/GameStateContext';
 
 describe('Gameboard', () => {
     const mockProps = {
@@ -71,7 +69,7 @@ describe('Gameboard', () => {
     it('supports keyboard interaction for cell selection', async () => {
         const user = userEvent.setup();
         render(<Gameboard {...mockProps} />);
-        const cells = screen.getAllByRole('gridcell');
+        // const cells = screen.getAllByRole('gridcell');
 
         // Tab to the first cell and press Enter
         await user.tab(); // First focusable element

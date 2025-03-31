@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import { useGameState } from './hooks/useGameState';
@@ -181,7 +181,7 @@ describe('App', () => {
     });
 
     it('disables hint button when all queens are revealed', async () => {
-        const user = userEvent.setup();
+        // const user = userEvent.setup();
 
         // Mock all colours being revealed
         vi.mocked(useGameState).mockReturnValue({

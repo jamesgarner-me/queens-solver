@@ -69,7 +69,7 @@ describe('Gameboard', () => {
     it('supports keyboard interaction for cell selection', async () => {
         const user = userEvent.setup();
         render(<Gameboard {...mockProps} />);
-        const cells = screen.getAllByRole('gridcell');
+        // const cells = screen.getAllByRole('gridcell');
 
         // Tab to the first cell and press Enter
         await user.tab(); // First focusable element

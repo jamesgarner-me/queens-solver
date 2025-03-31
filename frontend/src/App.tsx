@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import MainLayout from './layouts/MainLayout';
 import GamePage from './pages/GamePage';
 import { ModalProvider } from './context/ModalContext';
