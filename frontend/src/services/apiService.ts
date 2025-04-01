@@ -1,13 +1,12 @@
 import { BoardData } from '../types/gameTypes';
-
-const API_BASE_URL = 'http://localhost:8000';
+import { config } from '../config';
 
 /**
  * Fetches the latest board data from the API
  */
 export const fetchLatestBoard = async (): Promise<BoardData> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/boards/latest`);
+        const response = await fetch(`${config.apiBaseUrl}/boards/latest`);
 
         if (!response.ok) {
             throw new Error(`API request failed with status ${response.status}`);
