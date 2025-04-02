@@ -2,7 +2,7 @@
 
 ## System Architecture
 
-The Queens Solver application follows a client-server architecture with clear separation of concerns and environment-specific configurations (development and production only):
+The Queens Solver application follows a client-server architecture with clear separation of concerns and environment-specific configurations (only development (local) and production):
 
 ```mermaid
 graph LR

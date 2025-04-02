@@ -1,28 +1,35 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+    Stage:
+        Type: String
+        Default: prod
+        AllowedValues:
+            - dev
+            - staging
+            - prod
+        Description: The deployment stage (dev, staging, prod)
+
 Globals:
     Function:
         Timeout: 30
-        Runtime: python3.9
+        Runtime: python3.13
         MemorySize: 256
         Environment:
             Variables:
-                ALLOWED_ORIGINS: "https://your-cloudfront-domain.cloudfront.net"
+                ENVIRONMENT: !Ref Stage
+                API_STAGE: !Ref Stage
+                LOG_LEVEL: INFO
+                ALLOWED_ORIGINS: !Sub https://${CloudFrontDistribution.DomainName}
 
 Resources:
+    # Lambda Function
     QueensSolverFunction:
         Type: AWS::Serverless::Function
         Properties:
             CodeUri: src/
-            Handler: lambda_function.handler
-            Events:
-                ApiEvent:
-                    Type: Api
-                    Properties:
-                        Path: /boards/latest
-                        Method: get
-                        RestApiId: !Ref QueensSolverApi
+            Handler: lambda_function.lambda_handler
             Policies:
                 - AWSLambdaBasicExecutionRole
                 - Statement:
@@ -33,20 +40,182 @@ Resources:
                             - logs:PutLogEvents
                         Resource: "*"
 
+    # API Gateway
     QueensSolverApi:
-        Type: AWS::Serverless::Api
+        Type: AWS::ApiGateway::RestApi
         Properties:
-            StageName: prod
-            Cors:
-                AllowMethods: "'GET'"
-                AllowHeaders: "'*'"
-                AllowOrigin: "'https://your-cloudfront-domain.cloudfront.net'"
-                MaxAge: "'300'"
+            Name: !Sub ${AWS::StackName}-api-${Stage}
+            Description: API for Queens Solver game
+            EndpointConfiguration:
+                Types:
+                    - REGIONAL
+
+    # API Gateway Stage
+    ApiStage:
+        Type: AWS::ApiGateway::Stage
+        Properties:
+            DeploymentId: !Ref ApiDeployment
+            RestApiId: !Ref QueensSolverApi
+            StageName: !Ref Stage
+            Variables:
+                lambdaAlias: !Ref Stage
+
+    # API Gateway Deployment
+    ApiDeployment:
+        Type: AWS::ApiGateway::Deployment
+        DependsOn:
+            - ApiRootMethod
+            - ApiBoardsLatestMethod
+        Properties:
+            RestApiId: !Ref QueensSolverApi
+            Description: !Sub "Deployment for ${Stage} stage"
+
+    # API Gateway Resources
+    ApiRootResource:
+        Type: AWS::ApiGateway::Resource
+        Properties:
+            RestApiId: !Ref QueensSolverApi
+            ParentId: !GetAtt QueensSolverApi.RootResourceId
+            PathPart: ""
+
+    ApiBoardsResource:
+        Type: AWS::ApiGateway::Resource
+        Properties:
+            RestApiId: !Ref QueensSolverApi
+            ParentId: !GetAtt QueensSolverApi.RootResourceId
+            PathPart: "boards"
+
+    ApiBoardsLatestResource:
+        Type: AWS::ApiGateway::Resource
+        Properties:
+            RestApiId: !Ref QueensSolverApi
+            ParentId: !Ref ApiBoardsResource
+            PathPart: "latest"
+
+    # API Gateway Methods
+    ApiRootMethod:
+        Type: AWS::ApiGateway::Method
+        Properties:
+            RestApiId: !Ref QueensSolverApi
+            ResourceId: !GetAtt QueensSolverApi.RootResourceId
+            HttpMethod: GET
+            AuthorizationType: NONE
+            Integration:
+                Type: AWS_PROXY
+                IntegrationHttpMethod: POST
+                Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${QueensSolverFunction.Arn}/invocations
+            MethodResponses:
+                - StatusCode: 200
+                  ResponseModels:
+                      application/json: "Empty"
+                  ResponseParameters:
+                      method.response.header.Access-Control-Allow-Origin: true
+
+    ApiBoardsLatestMethod:
+        Type: AWS::ApiGateway::Method
+        Properties:
+            RestApiId: !Ref QueensSolverApi
+            ResourceId: !Ref ApiBoardsLatestResource
+            HttpMethod: GET
+            AuthorizationType: NONE
+            Integration:
+                Type: AWS_PROXY
+                IntegrationHttpMethod: POST
+                Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${QueensSolverFunction.Arn}/invocations
+            MethodResponses:
+                - StatusCode: 200
+                  ResponseModels:
+                      application/json: "Empty"
+                  ResponseParameters:
+                      method.response.header.Access-Control-Allow-Origin: true
+
+    # CORS Configuration for /boards/latest
+    BoardsLatestCorsMethod:
+        Type: AWS::ApiGateway::Method
+        Properties:
+            RestApiId: !Ref QueensSolverApi
+            ResourceId: !Ref ApiBoardsLatestResource
+            HttpMethod: OPTIONS
+            AuthorizationType: NONE
+            Integration:
+                Type: MOCK
+                IntegrationResponses:
+                    - StatusCode: 200
+                      ResponseParameters:
+                          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                          method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                          method.response.header.Access-Control-Allow-Origin: "'*'"
+                      ResponseTemplates:
+                          application/json: "{}"
+                PassthroughBehavior: WHEN_NO_MATCH
+                RequestTemplates:
+                    application/json: '{"statusCode": 200}'
+            MethodResponses:
+                - StatusCode: 200
+                  ResponseModels:
+                      application/json: "Empty"
+                  ResponseParameters:
+                      method.response.header.Access-Control-Allow-Headers: true
+                      method.response.header.Access-Control-Allow-Methods: true
+                      method.response.header.Access-Control-Allow-Origin: true
+
+    # Lambda Permission for API Gateway
+    LambdaPermission:
+        Type: AWS::Lambda::Permission
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !GetAtt QueensSolverFunction.Arn
+            Principal: apigateway.amazonaws.com
+            SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${QueensSolverApi}/*/*/*
+
+    # CloudFront Distribution
+    CloudFrontDistribution:
+        Type: AWS::CloudFront::Distribution
+        Properties:
+            DistributionConfig:
+                Enabled: true
+                DefaultRootObject: index.html
+                Origins:
+                    - DomainName: !Sub ${QueensSolverApi}.execute-api.${AWS::Region}.amazonaws.com
+                      Id: ApiGatewayOrigin
+                      OriginPath: !Sub "/${Stage}"
+                      CustomOriginConfig:
+                          HTTPPort: 80
+                          HTTPSPort: 443
+                          OriginProtocolPolicy: https-only
+                          OriginSSLProtocols:
+                              - TLSv1.2
+                DefaultCacheBehavior:
+                    TargetOriginId: ApiGatewayOrigin
+                    ViewerProtocolPolicy: redirect-to-https
+                    AllowedMethods:
+                        - GET
+                        - HEAD
+                        - OPTIONS
+                    CachedMethods:
+                        - GET
+                        - HEAD
+                    ForwardedValues:
+                        QueryString: true
+                        Cookies:
+                            Forward: none
+                    DefaultTTL: 0
+                    MinTTL: 0
+                    MaxTTL: 0
+                CustomErrorResponses:
+                    - ErrorCode: 404
+                      ResponseCode: 200
+                      ResponsePagePath: /index.html
+                HttpVersion: http2
+                PriceClass: PriceClass_100
 
 Outputs:
-    QueensSolverApi:
-        Description: "API Gateway endpoint URL for Prod stage"
-        Value: !Sub "https://${QueensSolverApi}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    ApiEndpoint:
+        Description: API Gateway endpoint URL
+        Value: !Sub https://${QueensSolverApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/
     QueensSolverFunction:
-        Description: "Queens Solver Lambda Function ARN"
+        Description: Queens Solver Lambda Function ARN
         Value: !GetAtt QueensSolverFunction.Arn
+    CloudFrontDomain:
+        Description: CloudFront Distribution Domain Name
+        Value: !GetAtt CloudFrontDistribution.DomainName

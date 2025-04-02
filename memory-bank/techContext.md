@@ -110,10 +110,10 @@
 ### Deployment Process
 
 1. **Environment Strategy**
-   - Two environments only:
+   - Three environments:
      - Development: Local environment, not on AWS
-     - Production: Deployed on AWS
-   - No staging or other intermediate environments (personal project)
+     - Production: Deployed on AWS for end users
+   - Each environment has its own configuration
 
 2. **Deployment Automation**
    - GitHub Actions workflows handle CI/CD:
@@ -128,6 +128,7 @@
    
    # Production deployment is handled by GitHub workflow
    # Uses CloudFormation (NOT SAM) for infrastructure
+   # Deploys to API Gateway and Lambda with appropriate stage
    ```
 
 4. **Frontend Deployment**
@@ -137,10 +138,11 @@
    npm run dev
    
    # Production build
-   npm run build
+   npm run build:production
    
-   # Production deployment is handled by GitHub workflow
+   # Deployment is handled by GitHub workflow
    # Deploys to S3 and configures CloudFront
+   # Environment variables are injected during build
    ```
 
 ## Technical Constraints

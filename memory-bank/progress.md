@@ -26,7 +26,7 @@
 ## What's Left to Build
 
 ### Backend Enhancements
-- 🔲 Implementation of AWS API Gateway to proxy backend API calls
+- ✅ Implementation of AWS API Gateway to proxy backend API calls
 - 🔲 Support for retrieving historical puzzles
 - 🔲 Performance optimizations for larger board sizes
 - 🔲 Enhanced error reporting and monitoring
@@ -47,7 +47,7 @@
 
 ### Documentation
 - ✅ Memory bank initialization
-- 🔲 API documentation
+- ✅ API Gateway documentation
 - 🔲 User guide/tutorial
 - 🔲 Developer onboarding documentation
 
