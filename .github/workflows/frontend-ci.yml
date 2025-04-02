@@ -116,7 +116,12 @@ jobs:
 
             - name: Deploy to S3
               run: |
-                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver --delete
+                  # Deploy with proper content types
+                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver --delete --cache-control "max-age=31536000,public" --exclude "*.html"
+                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver --delete --cache-control "max-age=0,no-cache,no-store,must-revalidate" --content-type "text/html" --include "*.html"
+
+                  # Explicitly set content types for JavaScript files to ensure proper MIME types
+                  aws s3 cp s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/assets/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/assets/ --recursive --exclude "*" --include "*.js" --content-type "application/javascript" --metadata-directive REPLACE
 
             - name: Get CloudFront URL
               id: get-cloudfront-url
@@ -138,9 +143,6 @@ jobs:
 
             - name: Update backend with CloudFront URL
               run: |
-                  # Use the same hardcoded certificate ARN
-                  CERT_ARN="arn:aws:acm:us-east-1:449421028589:certificate/79fd171b-4dfa-47a4-9e6c-a186b9e76eb1"
-
                   aws cloudformation deploy \
                     --template-file ../backend/template.yaml \
                     --stack-name queens-solver-backend \
@@ -148,7 +150,7 @@ jobs:
                       FrontendCloudFrontUrl=${{ steps.get-cloudfront-url.outputs.cloudfront_url }} \
                       DomainName=${{ secrets.DOMAIN_NAME }} \
                       ApiSubdomain=api \
-                      CertificateArn=$CERT_ARN \
+                      CertificateArn=${{ steps.get-certificate.outputs.certificate_arn }} \
                     --capabilities CAPABILITY_IAM \
                     --no-fail-on-empty-changeset
 

@@ -76,6 +76,7 @@ Resources:
                           QueryString: false
                           Cookies:
                               Forward: none
+                      ResponseHeadersPolicyId: !Ref QueensSolverResponseHeadersPolicy
                 CustomErrorResponses:
                     - ErrorCode: 403
                       ResponsePagePath: /queens-solver/index.html
@@ -121,6 +122,31 @@ Resources:
                 DNSName: !GetAtt QueensSolverDistribution.DomainName
                 HostedZoneId: Z2FDTNDATAQYW2 # CloudFront hosted zone ID (constant)
                 EvaluateTargetHealth: false
+
+    QueensSolverResponseHeadersPolicy:
+        Type: AWS::CloudFront::ResponseHeadersPolicy
+        Properties:
+            ResponseHeadersPolicyConfig:
+                Name: !Sub ${AWS::StackName}-response-headers-policy
+                Comment: 'Response headers policy for Queens Solver application'
+                CorsConfig:
+                    AccessControlAllowOrigins:
+                        Items: ['*']
+                    AccessControlAllowHeaders:
+                        Items: ['*']
+                    AccessControlAllowMethods:
+                        Items: ['GET', 'HEAD', 'OPTIONS']
+                    AccessControlMaxAgeSec: 600
+                    OriginOverride: false
+                    AccessControlAllowCredentials: false
+                CustomHeadersConfig:
+                    Items:
+                        - Header: Content-Type-Options
+                          Value: nosniff
+                          Override: true
+                        - Header: X-Frame-Options
+                          Value: SAMEORIGIN
+                          Override: true
 
 Outputs:
     BucketName:
