@@ -80,7 +80,7 @@ jobs:
                   FUNCTION_NAME=$(aws cloudformation describe-stacks \
                     --stack-name queens-solver-backend \
                     --query 'Stacks[0].Outputs[?OutputKey==`QueensSolverFunction`].OutputValue' \
-                    --output text)
+                    --output text | sed -E 's|arn:aws:lambda:.*:function:([^:]+).*|\1|')
                   echo "function_name=$FUNCTION_NAME" >> $GITHUB_OUTPUT
 
     deploy:
