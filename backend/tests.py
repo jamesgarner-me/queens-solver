@@ -1,7 +1,31 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import json
-from main import parse_game, solve_board, get_sorted_colour_regions, is_safe
+import sys
+import os
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# Add the current directory to the Python path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+logger.debug(f"Current directory: {current_dir}")
+sys.path.insert(0, current_dir)
+
+try:
+    from main import (
+        parse_game,
+        solve_board,
+        get_sorted_colour_regions,
+        is_safe,
+        get_game
+    )
+    logger.debug("Successfully imported functions from main.py")
+except ImportError as e:
+    logger.error(f"Failed to import from main.py: {e}")
+    raise
 
 class TestQueensSolver(unittest.TestCase):
     def setUp(self):
