@@ -14,6 +14,19 @@ Parameters:
         Default: "https://dummy.cloudfront.net" # This will be overridden during deployment
 
 Resources:
+    # Lambda Layer for Dependencies
+    DependenciesLayer:
+        Type: AWS::Lambda::LayerVersion
+        Properties:
+            LayerName: !Sub ${AWS::StackName}-dependencies-${Stage}
+            Description: Python dependencies for Queens Solver
+            CompatibleRuntimes:
+                - python3.13
+            Content:
+                ZipFile: |
+                    # This is a placeholder. The actual content will be updated via the deploy job
+                    print("Placeholder layer content")
+
     # Lambda Function
     QueensSolverFunction:
         Type: AWS::Lambda::Function
@@ -35,6 +48,8 @@ Resources:
                     LOG_LEVEL: INFO
                     ALLOWED_ORIGINS: !Ref FrontendCloudFrontUrl
             Role: !GetAtt LambdaExecutionRole.Arn
+            Layers:
+                - !Ref DependenciesLayer
 
     # Lambda Execution Role
     LambdaExecutionRole:

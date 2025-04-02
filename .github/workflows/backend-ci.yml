@@ -105,18 +105,37 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ secrets.AWS_REGION }}
 
-            - name: Create deployment package
+            - name: Create function and layer packages
               run: |
-                  rm -rf deployment-package
-                  mkdir -p deployment-package
-                  # Copy source files
-                  cp -r src/* deployment-package/
-                  # Install dependencies directly at root level with platform flag
-                  cd deployment-package
-                  python3 -m pip install --platform manylinux2014_x86_64 --implementation cp --only-binary=:all: -r ../requirements.txt -t .
-                  # Create deployment zip
+                  # Create function package (application code only)
+                  rm -rf function-package
+                  mkdir -p function-package
+                  cp -r src/* function-package/
+                  cd function-package
                   zip -r ../function.zip .
                   cd ..
+
+                  # Create layer package (dependencies only)
+                  rm -rf layer-package
+                  mkdir -p layer-package/python
+                  pip install -r requirements.txt -t layer-package/python
+                  cd layer-package
+                  zip -r ../layer.zip .
+                  cd ..
+
+            - name: Update Lambda layer
+              id: update-layer
+              run: |
+                  LAYER_VERSION=$(aws lambda publish-layer-version \
+                    --layer-name $(aws cloudformation describe-stacks \
+                      --stack-name queens-solver-backend \
+                      --query 'Stacks[0].Resources[?LogicalResourceId==`DependenciesLayer`].PhysicalResourceId' \
+                      --output text) \
+                    --zip-file fileb://layer.zip \
+                    --compatible-runtimes python3.13 \
+                    --query 'Version' \
+                    --output text)
+                  echo "layer_version=$LAYER_VERSION" >> $GITHUB_OUTPUT
 
             - name: Update Lambda function
               run: |
@@ -129,8 +148,19 @@ jobs:
                   aws lambda wait function-updated \
                     --function-name ${{ needs.deploy-infrastructure.outputs.function_name }}
 
-            - name: Update Lambda environment variables
+            - name: Update Lambda configuration
               run: |
+                  # Get the layer ARN
+                  LAYER_ARN=$(aws lambda list-layer-versions \
+                    --layer-name $(aws cloudformation describe-stacks \
+                      --stack-name queens-solver-backend \
+                      --query 'Stacks[0].Resources[?LogicalResourceId==`DependenciesLayer`].PhysicalResourceId' \
+                      --output text) \
+                    --query 'LayerVersions[0].LayerVersionArn' \
+                    --output text)
+
+                  # Update function configuration with both environment variables and layer
                   aws lambda update-function-configuration \
                     --function-name ${{ needs.deploy-infrastructure.outputs.function_name }} \
+                    --layers "$LAYER_ARN" \
                     --environment "Variables={ENVIRONMENT=${{ env.ENVIRONMENT }},API_STAGE=${{ env.API_STAGE }},LOG_LEVEL=${{ env.LOG_LEVEL }},ALLOWED_ORIGINS=http://localhost:5173,${{ needs.deploy-infrastructure.outputs.frontend_url }}}"
