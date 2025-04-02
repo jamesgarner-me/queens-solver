@@ -160,10 +160,11 @@ jobs:
 
             - name: Update Lambda configuration
               run: |
-                  # Get the full layer name from CloudFormation
-                  LAYER_NAME=$(aws cloudformation describe-stacks \
+                  # Get the full layer name from CloudFormation using describe-stack-resources
+                  LAYER_NAME=$(aws cloudformation describe-stack-resources \
                     --stack-name queens-solver-backend \
-                    --query 'Stacks[0].Resources[?LogicalResourceId==`DependenciesLayer`].PhysicalResourceId' \
+                    --logical-resource-id DependenciesLayer \
+                    --query 'StackResources[0].PhysicalResourceId' \
                     --output text)
 
                   echo "Layer name: $LAYER_NAME"
