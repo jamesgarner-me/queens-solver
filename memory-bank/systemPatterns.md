@@ -2,7 +2,7 @@
 
 ## System Architecture
 
-The Queens Solver application follows a client-server architecture with clear separation of concerns:
+The Queens Solver application follows a client-server architecture with clear separation of concerns and environment-specific configurations (development and production only):
 
 ```mermaid
 graph LR
@@ -10,11 +10,14 @@ graph LR
         UI[React/TS UI]
         S3[S3 Bucket]
         CF[CloudFront]
+        EnvConfig[Environment Config\n(Dev/Prod)]
     end
     
     subgraph Backend
         API[API Gateway]
+        Stages[API Stages\n(Dev/Prod)]
         Lambda[Python Lambda]
+        EnvVars[Environment Variables]
     end
     
     subgraph External
@@ -23,8 +26,11 @@ graph LR
     
     UI --> CF
     CF --> S3
-    UI --> API
-    API --> Lambda
+    UI --> EnvConfig
+    EnvConfig --> API
+    API --> Stages
+    Stages --> Lambda
+    Lambda --> EnvVars
     Lambda --> LinkedIn
 ```
 
@@ -44,6 +50,8 @@ graph LR
    - Deployed as AWS Lambda function
 
 3. **Infrastructure**
+   - **Infrastructure as Code**: AWS CloudFormation templates are used (explicitly NOT using SAM)
+   - **Deployment Automation**: GitHub workflows (backend-ci and frontend-ci) handle CI/CD pipelines
    - **CloudFront**: Content delivery network for frontend assets
    - **S3**: Static hosting for frontend application
    - **API Gateway**: RESTful API endpoint management
@@ -94,19 +102,30 @@ graph LR
      - Potentially slower for large boards
      - Lambda timeout considerations
 
-5. **Deployment Architecture: AWS Serverless**
+5. **Deployment Architecture: AWS Serverless with GitHub CI/CD**
+   - **Environments**:
+     - Development: Local environment, not on AWS
+     - Production: Deployed on AWS
+     - No staging or other intermediate environments (personal project)
    - **Frontend**:
-     - S3 for static hosting
-     - CloudFront for content delivery
+     - S3 for static hosting (production only)
+     - CloudFront for content delivery (production only)
      - Environment-based configuration
+     - Deployed via GitHub frontend-ci workflow
    - **Backend**:
-     - Lambda for serverless execution
-     - API Gateway for HTTP endpoints
-     - CloudWatch for monitoring
+     - Lambda for serverless execution (production only)
+     - API Gateway for HTTP endpoints (production only)
+     - CloudWatch for monitoring (production only)
+     - Local FastAPI server for development
+     - Deployed via GitHub backend-ci workflow
+   - **Infrastructure Provisioning**:
+     - CloudFormation templates (explicitly NOT using SAM)
+     - Automated deployment through GitHub workflows
    - **Benefits**:
      - Scalable infrastructure
      - Cost-effective
      - Managed services
+     - Automated deployment pipeline
    - **Trade-offs**:
      - Vendor lock-in
      - Cold starts
@@ -141,10 +160,17 @@ graph LR
 
 ## Component Relationships
 
-### AWS Infrastructure
+### AWS Infrastructure & Deployment
 
 ```mermaid
 graph TD
+    subgraph "CI/CD"
+        GH[GitHub Repository]
+        FECI[frontend-ci Workflow]
+        BECI[backend-ci Workflow]
+        CFN[CloudFormation Templates]
+    end
+    
     subgraph Frontend
         UI[React/TS UI]
         S3[S3 Bucket]
@@ -161,6 +187,13 @@ graph TD
         LinkedIn[LinkedIn API]
     end
     
+    GH --> FECI
+    GH --> BECI
+    FECI --> CFN
+    BECI --> CFN
+    CFN --> S3
+    CFN --> Lambda
+    CFN --> API
     UI --> CF
     CF --> S3
     UI --> API

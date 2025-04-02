@@ -109,24 +109,38 @@
 
 ### Deployment Process
 
-1. **Backend Deployment**
+1. **Environment Strategy**
+   - Two environments only:
+     - Development: Local environment, not on AWS
+     - Production: Deployed on AWS
+   - No staging or other intermediate environments (personal project)
+
+2. **Deployment Automation**
+   - GitHub Actions workflows handle CI/CD:
+     - backend-ci: Deploys backend to AWS
+     - frontend-ci: Deploys frontend to AWS
+
+3. **Backend Deployment**
    ```bash
-   # Package Lambda function
+   # Local development
    cd backend
-   sam build
+   uvicorn src.main:app --reload
    
-   # Deploy to AWS
-   sam deploy
+   # Production deployment is handled by GitHub workflow
+   # Uses CloudFormation (NOT SAM) for infrastructure
    ```
 
-2. **Frontend Deployment**
+4. **Frontend Deployment**
    ```bash
-   # Build production assets
+   # Local development
    cd frontend
+   npm run dev
+   
+   # Production build
    npm run build
    
-   # Deploy to hosting service
-   # (Specific commands depend on hosting provider)
+   # Production deployment is handled by GitHub workflow
+   # Deploys to S3 and configures CloudFront
    ```
 
 ## Technical Constraints
