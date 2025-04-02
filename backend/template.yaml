@@ -18,6 +18,17 @@ Parameters:
     DependenciesLayerKey:
         Type: String
         Description: S3 key for the dependencies layer
+    DomainName:
+        Type: String
+        Default: jamesgarner.me
+        Description: The domain name to use for the application
+    ApiSubdomain:
+        Type: String
+        Default: api
+        Description: Subdomain for the API
+    CertificateArn:
+        Type: String
+        Description: ARN of the SSL certificate for the API domain
 
 Resources:
     # Lambda Layer for Dependencies
@@ -181,7 +192,7 @@ Resources:
                       ResponseParameters:
                           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
                           method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
-                          method.response.header.Access-Control-Allow-Origin: !Sub "'${FrontendCloudFrontUrl}'"
+                          method.response.header.Access-Control-Allow-Origin: !Sub "'${FrontendCloudFrontUrl},https://${DomainName},https://www.${DomainName},http://localhost:5173'"
                       ResponseTemplates:
                           application/json: "{}"
                 PassthroughBehavior: WHEN_NO_MATCH
@@ -211,7 +222,7 @@ Resources:
                       ResponseParameters:
                           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
                           method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
-                          method.response.header.Access-Control-Allow-Origin: !Sub "'${FrontendCloudFrontUrl}'"
+                          method.response.header.Access-Control-Allow-Origin: !Sub "'${FrontendCloudFrontUrl},https://${DomainName},https://www.${DomainName},http://localhost:5173'"
                       ResponseTemplates:
                           application/json: "{}"
                 PassthroughBehavior: WHEN_NO_MATCH
@@ -235,6 +246,36 @@ Resources:
             Principal: apigateway.amazonaws.com
             SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${QueensSolverApi}/*/*/*
 
+    # API Gateway Custom Domain
+    ApiCustomDomain:
+        Type: AWS::ApiGateway::DomainName
+        Properties:
+            DomainName: !Sub ${ApiSubdomain}.${DomainName}
+            RegionalCertificateArn: !Ref CertificateArn
+            EndpointConfiguration:
+                Types:
+                    - REGIONAL
+
+    # API Gateway Base Path Mapping
+    ApiBasePathMapping:
+        Type: AWS::ApiGateway::BasePathMapping
+        Properties:
+            DomainName: !Ref ApiCustomDomain
+            RestApiId: !Ref QueensSolverApi
+            Stage: !Ref Stage
+
+    # Route 53 Record for API
+    ApiDomainRecord:
+        Type: AWS::Route53::RecordSet
+        Properties:
+            HostedZoneName: !Sub ${DomainName}.
+            Name: !Sub ${ApiSubdomain}.${DomainName}
+            Type: A
+            AliasTarget:
+                DNSName: !GetAtt ApiCustomDomain.RegionalDomainName
+                HostedZoneId: !GetAtt ApiCustomDomain.RegionalHostedZoneId
+                EvaluateTargetHealth: false
+
 Outputs:
     ApiEndpoint:
         Description: API Gateway endpoint URL
@@ -242,3 +283,6 @@ Outputs:
     QueensSolverFunction:
         Description: Queens Solver Lambda Function ARN
         Value: !GetAtt QueensSolverFunction.Arn
+    ApiCustomDomainUrl:
+        Description: Custom domain URL for API
+        Value: !Sub https://${ApiSubdomain}.${DomainName}

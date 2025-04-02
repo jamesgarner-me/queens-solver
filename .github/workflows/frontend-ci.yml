@@ -85,11 +85,22 @@ jobs:
             - name: Build for production
               run: npm run build:production
 
+            - name: Get Certificate ARN
+              id: get-certificate
+              run: |
+                  CERT_ARN=$(aws acm list-certificates --region us-east-1 \
+                    --query "CertificateSummaryList[?DomainName=='${{ secrets.DOMAIN_NAME }}'].CertificateArn" \
+                    --output text)
+                  echo "certificate_arn=$CERT_ARN" >> $GITHUB_OUTPUT
+
             - name: Deploy CloudFormation stack
               run: |
                   aws cloudformation deploy \
                     --template-file template.yaml \
                     --stack-name queens-solver-frontend \
+                    --parameter-overrides \
+                      DomainName=${{ secrets.DOMAIN_NAME }} \
+                      CertificateArn=${{ steps.get-certificate.outputs.certificate_arn }} \
                     --capabilities CAPABILITY_IAM \
                     --no-fail-on-empty-changeset
 
@@ -104,7 +115,7 @@ jobs:
 
             - name: Deploy to S3
               run: |
-                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }} --delete
+                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver --delete
 
             - name: Get CloudFront URL
               id: get-cloudfront-url
@@ -115,12 +126,25 @@ jobs:
                     --output text)
                   echo "cloudfront_url=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
 
+            - name: Get Domain URL
+              id: get-domain-url
+              run: |
+                  DOMAIN_URL=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-frontend \
+                    --query 'Stacks[0].Outputs[?OutputKey==`DomainURL`].OutputValue' \
+                    --output text)
+                  echo "domain_url=$DOMAIN_URL" >> $GITHUB_OUTPUT
+
             - name: Update backend with CloudFront URL
               run: |
                   aws cloudformation deploy \
                     --template-file ../backend/template.yaml \
                     --stack-name queens-solver-backend \
-                    --parameter-overrides FrontendCloudFrontUrl=${{ steps.get-cloudfront-url.outputs.cloudfront_url }} \
+                    --parameter-overrides \
+                      FrontendCloudFrontUrl=${{ steps.get-cloudfront-url.outputs.cloudfront_url }} \
+                      DomainName=${{ secrets.DOMAIN_NAME }} \
+                      ApiSubdomain=api \
+                      CertificateArn=${{ steps.get-certificate.outputs.certificate_arn }} \
                     --capabilities CAPABILITY_IAM \
                     --no-fail-on-empty-changeset
 

@@ -1,5 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Frontend infrastructure for Queens Solver'
+Description: 'Frontend infrastructure for Queens Solver with custom domain'
+
+Parameters:
+    DomainName:
+        Type: String
+        Default: jamesgarner.me
+        Description: The domain name to use for the application
+
+    CertificateArn:
+        Type: String
+        Description: ARN of the SSL certificate for the domain (must be in us-east-1 for CloudFront)
 
 Resources:
     QueensSolverBucket:
@@ -31,6 +41,9 @@ Resources:
             DistributionConfig:
                 Enabled: true
                 DefaultRootObject: index.html
+                Aliases:
+                    - !Ref DomainName
+                    - !Sub www.${DomainName}
                 Origins:
                     - DomainName: !GetAtt QueensSolverBucket.RegionalDomainName
                       Id: S3Origin
@@ -49,6 +62,21 @@ Resources:
                         QueryString: false
                         Cookies:
                             Forward: none
+                    PathPattern: '/queens-solver/*'
+                CacheBehaviors:
+                    - PathPattern: '/queens-solver/*'
+                      TargetOriginId: S3Origin
+                      ViewerProtocolPolicy: redirect-to-https
+                      AllowedMethods:
+                          - GET
+                          - HEAD
+                      CachedMethods:
+                          - GET
+                          - HEAD
+                      ForwardedValues:
+                          QueryString: false
+                          Cookies:
+                              Forward: none
                 CustomErrorResponses:
                     - ErrorCode: 403
                       ResponsePagePath: /index.html
@@ -56,12 +84,44 @@ Resources:
                     - ErrorCode: 404
                       ResponsePagePath: /index.html
                       ResponseCode: 200
+                ViewerCertificate:
+                    AcmCertificateArn: !Ref CertificateArn
+                    SslSupportMethod: sni-only
+                    MinimumProtocolVersion: TLSv1.2_2021
 
     CloudFrontOriginAccessIdentity:
         Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
         Properties:
             CloudFrontOriginAccessIdentityConfig:
                 Comment: !Sub ${AWS::StackName}-OAI
+
+    # Route 53 Records
+    HostedZone:
+        Type: AWS::Route53::HostedZone
+        Properties:
+            Name: !Ref DomainName
+
+    DomainRecord:
+        Type: AWS::Route53::RecordSet
+        Properties:
+            HostedZoneId: !Ref HostedZone
+            Name: !Ref DomainName
+            Type: A
+            AliasTarget:
+                DNSName: !GetAtt QueensSolverDistribution.DomainName
+                HostedZoneId: Z2FDTNDATAQYW2 # CloudFront hosted zone ID (constant)
+                EvaluateTargetHealth: false
+
+    WwwDomainRecord:
+        Type: AWS::Route53::RecordSet
+        Properties:
+            HostedZoneId: !Ref HostedZone
+            Name: !Sub www.${DomainName}
+            Type: A
+            AliasTarget:
+                DNSName: !GetAtt QueensSolverDistribution.DomainName
+                HostedZoneId: Z2FDTNDATAQYW2 # CloudFront hosted zone ID (constant)
+                EvaluateTargetHealth: false
 
 Outputs:
     BucketName:
@@ -73,3 +133,12 @@ Outputs:
     CloudFrontDistributionId:
         Description: ID of the CloudFront distribution
         Value: !Ref QueensSolverDistribution
+    DomainURL:
+        Description: Custom domain URL
+        Value: !Sub https://${DomainName}/queens-solver
+    HostedZoneId:
+        Description: ID of the Route 53 hosted zone
+        Value: !Ref HostedZone
+    NameServers:
+        Description: Nameservers for the hosted zone
+        Value: !Join [', ', !GetAtt HostedZone.NameServers]
