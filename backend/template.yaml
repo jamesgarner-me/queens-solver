@@ -29,6 +29,18 @@ Parameters:
     CertificateArn:
         Type: String
         Description: ARN of the SSL certificate for the API domain
+    RateLimit:
+        Type: Number
+        Default: 5
+        Description: Rate limit (requests per second)
+    BurstLimit:
+        Type: Number
+        Default: 20
+        Description: Burst limit for API requests
+    QuotaLimit:
+        Type: Number
+        Default: 1000
+        Description: Daily quota limit for API requests
 
 Resources:
     # Lambda Layer for Dependencies
@@ -111,6 +123,16 @@ Resources:
             StageName: !Ref Stage
             Variables:
                 lambdaAlias: !Ref Stage
+            MethodSettings:
+                - ResourcePath: "/*"
+                  HttpMethod: "*"
+                  ThrottlingBurstLimit: !Ref BurstLimit
+                  ThrottlingRateLimit: !Ref RateLimit
+                  CachingEnabled: true
+                  CacheTtlInSeconds: 600 # 10 minute cache
+                  MetricsEnabled: true
+                  LoggingLevel: INFO
+                  DataTraceEnabled: true
 
     # API Gateway Deployment
     ApiDeployment:
@@ -276,6 +298,55 @@ Resources:
                 HostedZoneId: Z2FDTNDATAQYW2 # CloudFront hosted zone ID (constant)
                 EvaluateTargetHealth: false
 
+    # API Gateway Usage Plan
+    ApiUsagePlan:
+        Type: AWS::ApiGateway::UsagePlan
+        Properties:
+            UsagePlanName: !Sub ${AWS::StackName}-usage-plan-${Stage}
+            Description: Usage plan for Queens Solver API
+            ApiStages:
+                - ApiId: !Ref QueensSolverApi
+                  Stage: !Ref Stage
+            Throttle:
+                RateLimit: !Ref RateLimit
+                BurstLimit: !Ref BurstLimit
+            Quota:
+                Limit: !Ref QuotaLimit
+                Period: DAY
+
+    # WAF Web ACL for Rate-Based Protection
+    ApiWafWebAcl:
+        Type: AWS::WAFv2::WebACL
+        Properties:
+            Name: !Sub ${AWS::StackName}-waf-${Stage}
+            Scope: REGIONAL
+            DefaultAction:
+                Allow: {}
+            VisibilityConfig:
+                SampledRequestsEnabled: true
+                CloudWatchMetricsEnabled: true
+                MetricName: !Sub ${AWS::StackName}-waf-metrics-${Stage}
+            Rules:
+                - Name: RateLimitRule
+                  Priority: 0
+                  Action:
+                      Block: {}
+                  VisibilityConfig:
+                      SampledRequestsEnabled: true
+                      CloudWatchMetricsEnabled: true
+                      MetricName: !Sub ${AWS::StackName}-rate-limit-${Stage}
+                  Statement:
+                      RateBasedStatement:
+                          Limit: 300
+                          AggregateKeyType: IP
+
+    # WAF Web ACL Association
+    ApiWafWebAclAssociation:
+        Type: AWS::WAFv2::WebACLAssociation
+        Properties:
+            ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${QueensSolverApi}/stages/${Stage}
+            WebACLArn: !GetAtt ApiWafWebAcl.Arn
+
 Outputs:
     ApiEndpoint:
         Description: API Gateway endpoint URL
@@ -286,3 +357,9 @@ Outputs:
     ApiCustomDomainUrl:
         Description: Custom domain URL for API
         Value: !Sub https://${ApiSubdomain}.${DomainName}
+    UsagePlanId:
+        Description: API Usage Plan ID
+        Value: !Ref ApiUsagePlan
+    WafWebAclId:
+        Description: WAF Web ACL ID
+        Value: !Ref ApiWafWebAcl
