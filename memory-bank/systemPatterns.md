@@ -11,6 +11,7 @@ graph LR
         S3[S3 Bucket]
         CF[CloudFront]
         EnvConfig[Environment Config\n(Dev/Prod)]
+        ErrorPages[Static Error Pages]
     end
     
     subgraph Backend
@@ -27,6 +28,8 @@ graph LR
     
     UI --> CF
     CF --> S3
+    CF --> ErrorPages
+    ErrorPages --> S3
     UI --> EnvConfig
     EnvConfig --> API
     API --> Stages
@@ -42,6 +45,7 @@ graph LR
    - User interface for displaying puzzles and solutions
    - Communicates with backend via RESTful API
    - Handles rendering of game boards and solutions
+   - Provides custom error handling at application level
    - Deployed to AWS S3 and served via CloudFront
 
 2. **Backend (Python/Lambda)**
@@ -55,12 +59,13 @@ graph LR
 3. **Infrastructure**
    - **Infrastructure as Code**: AWS CloudFormation templates are used (explicitly NOT using SAM)
    - **Deployment Automation**: GitHub workflows (backend-ci and frontend-ci) handle CI/CD pipelines
-   - **CloudFront**: Content delivery network for frontend assets
+   - **CloudFront**: Content delivery network for frontend assets and error handling
    - **S3**: Static hosting for frontend application and storage for Lambda layer dependencies
    - **API Gateway**: RESTful API endpoint management
    - **Lambda**: Serverless function execution
    - **Lambda Layers**: Dependency management for Lambda functions
    - **External Services**: LinkedIn API integration
+   - **Error Handling**: Dual-layer approach with infrastructure and application-level handling
 
 ## Key Technical Decisions
 
@@ -165,6 +170,11 @@ graph LR
    - **Purpose**: Avoid prop drilling, centralize state
    - **Example**: ModalContext for managing modal state
 
+6. **Error Boundary Pattern (Frontend)**
+   - **Implementation**: Multi-layered error handling with fallbacks
+   - **Purpose**: Graceful degradation and user-friendly error states
+   - **Example**: Static HTML error pages, React ErrorPage component, CloudFront error responses
+
 ## Component Relationships
 
 ### AWS Infrastructure & Deployment
@@ -182,6 +192,7 @@ graph TD
         UI[React/TS UI]
         S3[S3 Bucket]
         CF[CloudFront]
+        ErrPages[Error Pages]
     end
     
     subgraph Backend
@@ -205,6 +216,7 @@ graph TD
     CFN --> API
     UI --> CF
     CF --> S3
+    CF --> ErrPages
     UI --> API
     API --> Lambda
     Lambda --> Layer
@@ -229,6 +241,7 @@ graph TD
 graph TD
     App[App.tsx] --> Layout[MainLayout]
     Layout --> Game[GamePage]
+    Layout --> Error[ErrorPage]
     Game --> Board[Gameboard]
     Board --> UI[UI Components]
     UI --> Button[Button]
@@ -252,9 +265,10 @@ graph TD
    CloudFront → S3 → React App → API Call → Update State → Render Gameboard → Display Solution
    ```
 
-4. **Error Handling Path**
+4. **Error Handling Flow**
    ```
-   Try API Call → Catch Exception → Format Error → Return Error Response → Display Error UI
+   Infrastructure Errors: Request → CloudFront → Error Status → Custom Error Page → User Recovery Option
+   Application Errors: React App → Error Detection → ErrorPage Component → User Recovery Option
    ```
 
 ## Data Flow
@@ -277,6 +291,13 @@ graph TD
    - Component rendering based on state
    - User interaction handling
 
+4. **Error Handling Flow**
+   - CloudFront error detection (403, 404, 500, etc.)
+   - Static error pages served from S3
+   - React routing error detection
+   - ErrorPage component rendering
+   - User recovery path via homepage link
+
 ## Security Considerations
 
 1. **API Authentication**
@@ -289,6 +310,8 @@ graph TD
    - Sanitized error messages to prevent information leakage
    - Graceful degradation on API failures
    - CloudWatch logging and monitoring
+   - Custom error pages with consistent branding
+   - No technical details exposed in user-facing error messages
 
 3. **Input Validation**
    - Type checking via TypeScript (frontend) and Pydantic (backend)
@@ -300,3 +323,9 @@ graph TD
    - S3 bucket policies
    - API Gateway authentication
    - Lambda execution role permissions
+   - Security headers:
+     - Content-Security-Policy
+     - X-Frame-Options
+     - Strict-Transport-Security
+     - Content-Type-Options
+     - Referrer-Policy
