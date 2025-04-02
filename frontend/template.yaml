@@ -102,11 +102,23 @@ Resources:
                       ResponseHeadersPolicyId: !Ref QueensSolverResponseHeadersPolicy
                 CustomErrorResponses:
                     - ErrorCode: 403
-                      ResponsePagePath: /queens-solver/index.html
-                      ResponseCode: 200
+                      ResponsePagePath: /queens-solver/error/403.html
+                      ResponseCode: 403
                     - ErrorCode: 404
-                      ResponsePagePath: /queens-solver/index.html
-                      ResponseCode: 200
+                      ResponsePagePath: /queens-solver/error/404.html
+                      ResponseCode: 404
+                    - ErrorCode: 500
+                      ResponsePagePath: /queens-solver/error/500.html
+                      ResponseCode: 500
+                    - ErrorCode: 502
+                      ResponsePagePath: /queens-solver/error/500.html
+                      ResponseCode: 502
+                    - ErrorCode: 503
+                      ResponsePagePath: /queens-solver/error/500.html
+                      ResponseCode: 503
+                    - ErrorCode: 504
+                      ResponsePagePath: /queens-solver/error/500.html
+                      ResponseCode: 504
                 ViewerCertificate:
                     AcmCertificateArn: !Ref CertificateArn
                     SslSupportMethod: sni-only
