@@ -88,17 +88,10 @@ jobs:
             - name: Get Certificate ARN
               id: get-certificate
               run: |
-                  CERT_ARN=$(aws acm list-certificates --region us-east-1 \
-                    --query "CertificateSummaryList[?DomainName=='${{ secrets.DOMAIN_NAME }}'].CertificateArn" \
-                    --output text)
-
-                  if [ -z "$CERT_ARN" ] || [ "$CERT_ARN" = "None" ]; then
-                    echo "ERROR: No ACM certificate found for ${{ secrets.DOMAIN_NAME }} in us-east-1 region"
-                    echo "Please create a certificate in us-east-1 for CloudFront distribution"
-                    exit 1
-                  fi
-
-                  echo "Certificate ARN: $CERT_ARN"
+                  # Hard-coded approach - use a specific certificate ARN directly
+                  # Using the same certificate as in backend-ci.yml for consistency
+                  CERT_ARN="arn:aws:acm:us-east-1:449421028589:certificate/79fd171b-4dfa-47a4-9e6c-a186b9e76eb1"
+                  echo "Using certificate ARN: $CERT_ARN"
                   echo "certificate_arn=$CERT_ARN" >> $GITHUB_OUTPUT
 
             - name: Deploy CloudFormation stack
@@ -145,6 +138,9 @@ jobs:
 
             - name: Update backend with CloudFront URL
               run: |
+                  # Use the same hardcoded certificate ARN
+                  CERT_ARN="arn:aws:acm:us-east-1:449421028589:certificate/79fd171b-4dfa-47a4-9e6c-a186b9e76eb1"
+
                   aws cloudformation deploy \
                     --template-file ../backend/template.yaml \
                     --stack-name queens-solver-backend \
@@ -152,7 +148,7 @@ jobs:
                       FrontendCloudFrontUrl=${{ steps.get-cloudfront-url.outputs.cloudfront_url }} \
                       DomainName=${{ secrets.DOMAIN_NAME }} \
                       ApiSubdomain=api \
-                      CertificateArn=${{ steps.get-certificate.outputs.certificate_arn }} \
+                      CertificateArn=$CERT_ARN \
                     --capabilities CAPABILITY_IAM \
                     --no-fail-on-empty-changeset
 
