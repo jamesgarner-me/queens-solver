@@ -105,14 +105,6 @@ Resources:
                       DefaultTTL: 0
                       MaxTTL: 0
                 CustomErrorResponses:
-                    # Root path error responses
-                    - ErrorCode: 403
-                      ResponsePagePath: /error/404.html
-                      ResponseCode: 404
-                    - ErrorCode: 404
-                      ResponsePagePath: /error/404.html
-                      ResponseCode: 404
-
                     # Queens-solver path error responses
                     - ErrorCode: 403
                       ErrorCachingMinTTL: 0
