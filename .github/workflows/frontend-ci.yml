@@ -98,7 +98,7 @@ jobs:
               id: get-hosted-zone
               run: |
                   # Check if hosted zone already exists
-                  HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name ${{ secrets.DOMAIN_NAME }}. --max-items 1 --query 'HostedZones[?Name==`'${{ secrets.DOMAIN_NAME }}.'\'].Id' --output text | sed 's/\/hostedzone\///')
+                  HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "${{ secrets.DOMAIN_NAME }}." --max-items 1 --output text --query 'HostedZones[0].Id' | sed 's/\/hostedzone\///')
 
                   if [ -n "$HOSTED_ZONE_ID" ]; then
                     echo "Existing hosted zone found: $HOSTED_ZONE_ID"
