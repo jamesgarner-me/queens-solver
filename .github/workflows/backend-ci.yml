@@ -70,6 +70,26 @@ jobs:
                   echo "frontend_url=$FRONTEND_URL" >> $GITHUB_OUTPUT
                   echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
 
+            - name: Get Certificate ARN
+              id: get-certificate
+              run: |
+                  DOMAIN_NAME=$(grep 'DomainName:' ../frontend/template.yaml | head -1 | awk '{print $2}')
+                  echo "Using domain name: $DOMAIN_NAME"
+
+                  CERT_ARN=$(aws acm list-certificates --region us-east-1 \
+                    --query "CertificateSummaryList[?DomainName=='$DOMAIN_NAME'].CertificateArn" \
+                    --output text)
+
+                  if [ -z "$CERT_ARN" ] || [ "$CERT_ARN" = "None" ]; then
+                    echo "Warning: No certificate found for $DOMAIN_NAME in us-east-1, trying current region"
+                    CERT_ARN=$(aws acm list-certificates \
+                      --query "CertificateSummaryList[?DomainName=='$DOMAIN_NAME'].CertificateArn" \
+                      --output text)
+                  fi
+
+                  echo "Certificate ARN: $CERT_ARN"
+                  echo "certificate_arn=$CERT_ARN" >> $GITHUB_OUTPUT
+
             - name: Get S3 bucket name
               id: get-bucket
               run: |
@@ -95,6 +115,9 @@ jobs:
 
             - name: Deploy CloudFormation stack
               run: |
+                  DOMAIN_NAME=$(grep 'DomainName:' ../frontend/template.yaml | head -1 | awk '{print $2}')
+                  API_SUBDOMAIN="api"
+
                   aws cloudformation deploy \
                     --template-file template.yaml \
                     --stack-name queens-solver-backend \
@@ -103,6 +126,9 @@ jobs:
                       FrontendCloudFrontUrl=${{ env.FRONTEND_URL }} \
                       DependenciesLayerBucket=${{ steps.get-bucket.outputs.bucket_name }} \
                       DependenciesLayerKey=dependencies.zip \
+                      DomainName=$DOMAIN_NAME \
+                      ApiSubdomain=$API_SUBDOMAIN \
+                      CertificateArn=${{ steps.get-certificate.outputs.certificate_arn }} \
                     --capabilities CAPABILITY_IAM \
                     --no-fail-on-empty-changeset
 
