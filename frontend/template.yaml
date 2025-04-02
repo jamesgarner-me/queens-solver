@@ -189,9 +189,9 @@ Resources:
                         FrameOption: SAMEORIGIN
                     StrictTransportSecurity:
                         Override: true
-                        IncludeSubdomains: true
-                        MaxAgeSeconds: 31536000 # 1 year
                         Preload: true
+                        AccessControlMaxAgeSec: 31536000 # 1 year
+                        IncludeSubdomains: true
                     ReferrerPolicy:
                         Override: true
                         ReferrerPolicy: strict-origin-when-cross-origin
