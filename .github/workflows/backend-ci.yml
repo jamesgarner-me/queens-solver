@@ -106,8 +106,8 @@ jobs:
                   mkdir -p deployment-package/package
                   # Copy all necessary files
                   cp -r src/* deployment-package/
-                  cp lambda_function.py config.py main.py __init__.py deployment-package/
-                  cp -r services/ utils/ deployment-package/
+                  cp src/lambda_function.py src/config.py src/main.py src/__init__.py deployment-package/
+                  cp -r src/services/ src/utils/ deployment-package/
                   # Install dependencies
                   cd deployment-package/package
                   python3 -m pip install -r ../../requirements.txt -t .
