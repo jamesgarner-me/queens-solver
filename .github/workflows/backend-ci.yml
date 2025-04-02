@@ -160,19 +160,23 @@ jobs:
 
             - name: Update Lambda configuration
               run: |
-                  # Get the full layer name from CloudFormation using describe-stack-resources
-                  LAYER_NAME=$(aws cloudformation describe-stack-resources \
+                  # Get the full layer ARN from CloudFormation using describe-stack-resources
+                  LAYER_FULL_ARN=$(aws cloudformation describe-stack-resources \
                     --stack-name queens-solver-backend \
                     --logical-resource-id DependenciesLayer \
                     --query 'StackResources[0].PhysicalResourceId' \
                     --output text)
 
-                  echo "Layer name: $LAYER_NAME"
+                  echo "Layer full ARN: $LAYER_FULL_ARN"
 
-                  if [ -z "$LAYER_NAME" ] || [ "$LAYER_NAME" = "None" ]; then
+                  if [ -z "$LAYER_FULL_ARN" ] || [ "$LAYER_FULL_ARN" = "None" ]; then
                     echo "ERROR: Layer resource not found in CloudFormation stack"
                     exit 1
                   fi
+
+                  # Extract just the layer name from the ARN (without version)
+                  LAYER_NAME=$(echo $LAYER_FULL_ARN | sed -E 's|arn:aws:lambda:[^:]+:[0-9]+:layer:([^:]+):.*|\1|')
+                  echo "Layer name: $LAYER_NAME"
 
                   # Get the latest layer version's ARN
                   LAYER_ARN=$(aws lambda list-layer-versions \
