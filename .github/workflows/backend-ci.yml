@@ -76,18 +76,26 @@ jobs:
                   DOMAIN_NAME=$(grep 'DomainName:' ../frontend/template.yaml | head -1 | awk '{print $2}')
                   echo "Using domain name: $DOMAIN_NAME"
 
+                  # For EDGE-optimized API Gateway, certificates MUST be in us-east-1 region
+                  echo "Checking for certificate in us-east-1 region (required for EDGE endpoint)..."
                   CERT_ARN=$(aws acm list-certificates --region us-east-1 \
-                    --query "CertificateSummaryList[?DomainName=='$DOMAIN_NAME'].CertificateArn" \
-                    --output text)
+                    --query "CertificateSummaryList[?DomainName=='api.$DOMAIN_NAME' || DomainName=='*.$DOMAIN_NAME' || DomainName=='$DOMAIN_NAME'].CertificateArn" \
+                    --output text | head -1)
 
                   if [ -z "$CERT_ARN" ] || [ "$CERT_ARN" = "None" ]; then
-                    echo "Warning: No certificate found for $DOMAIN_NAME in us-east-1, trying current region"
-                    CERT_ARN=$(aws acm list-certificates \
-                      --query "CertificateSummaryList[?DomainName=='$DOMAIN_NAME'].CertificateArn" \
-                      --output text)
+                    echo ""
+                    echo "ERROR: No ACM certificate found for api.$DOMAIN_NAME in us-east-1 region"
+                    echo "NOTE: Certificates for EDGE-optimized API Gateway MUST be in us-east-1 region"
+                    echo ""
+                    echo "To create a certificate in us-east-1 region, run the following command:"
+                    echo "aws acm request-certificate --region us-east-1 --domain-name api.$DOMAIN_NAME --validation-method DNS"
+                    echo ""
+                    echo "After creating the certificate, follow the validation process before rerunning this workflow."
+                    echo "For more information: https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html"
+                    exit 1
                   fi
 
-                  echo "Certificate ARN: $CERT_ARN"
+                  echo "Found Certificate ARN in us-east-1: $CERT_ARN"
                   echo "certificate_arn=$CERT_ARN" >> $GITHUB_OUTPUT
 
             - name: Get S3 bucket name

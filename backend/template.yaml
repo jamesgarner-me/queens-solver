@@ -100,7 +100,7 @@ Resources:
             Description: API for Queens Solver game
             EndpointConfiguration:
                 Types:
-                    - REGIONAL
+                    - EDGE
 
     # API Gateway Stage
     ApiStage:
@@ -251,10 +251,10 @@ Resources:
         Type: AWS::ApiGateway::DomainName
         Properties:
             DomainName: !Sub ${ApiSubdomain}.${DomainName}
-            RegionalCertificateArn: !Ref CertificateArn
+            CertificateArn: !Ref CertificateArn
             EndpointConfiguration:
                 Types:
-                    - REGIONAL
+                    - EDGE
 
     # API Gateway Base Path Mapping
     ApiBasePathMapping:
@@ -272,8 +272,8 @@ Resources:
             Name: !Sub ${ApiSubdomain}.${DomainName}
             Type: A
             AliasTarget:
-                DNSName: !GetAtt ApiCustomDomain.RegionalDomainName
-                HostedZoneId: !GetAtt ApiCustomDomain.RegionalHostedZoneId
+                DNSName: !GetAtt ApiCustomDomain.DistributionDomainName
+                HostedZoneId: Z2FDTNDATAQYW2 # CloudFront hosted zone ID (constant)
                 EvaluateTargetHealth: false
 
 Outputs:
