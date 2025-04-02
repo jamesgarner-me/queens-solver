@@ -22,10 +22,7 @@ Resources:
             Description: Python dependencies for Queens Solver
             CompatibleRuntimes:
                 - python3.13
-            Content:
-                ZipFile: |
-                    # This is a placeholder. The actual content will be updated via the deploy job
-                    print("Placeholder layer content")
+            ContentUri: dependencies.zip
 
     # Lambda Function
     QueensSolverFunction:
