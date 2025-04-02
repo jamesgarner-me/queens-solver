@@ -111,9 +111,9 @@ jobs:
                   mkdir -p deployment-package
                   # Copy source files
                   cp -r src/* deployment-package/
-                  # Install dependencies directly at root level
+                  # Install dependencies directly at root level with platform flag
                   cd deployment-package
-                  python3 -m pip install -r ../requirements.txt -t .
+                  python3 -m pip install --platform manylinux2014_x86_64 --implementation cp --only-binary=:all: -r ../requirements.txt -t .
                   # Create deployment zip
                   zip -r ../function.zip .
                   cd ..
