@@ -6,8 +6,8 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 API_STAGE = os.getenv("API_STAGE", "dev")
 
 # Get allowed origins from environment variable or use default for development
-DEFAULT_ORIGINS = "http://localhost:5173" if ENVIRONMENT == "development" else "*"
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", DEFAULT_ORIGINS).split(",")
+DEFAULT_ORIGINS = "http://localhost:5173" if ENVIRONMENT == "development" else ""
+ALLOWED_ORIGINS = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", DEFAULT_ORIGINS).split(",") if origin.strip()]
 
 # Base URLs
 GAME_BASE_URL = "https://www.linkedin.com/games/view/queens/desktop/"

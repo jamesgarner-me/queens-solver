@@ -133,4 +133,4 @@ jobs:
               run: |
                   aws lambda update-function-configuration \
                     --function-name ${{ needs.deploy-infrastructure.outputs.function_name }} \
-                    --environment "Variables={ENVIRONMENT=${{ env.ENVIRONMENT }},API_STAGE=${{ env.API_STAGE }},LOG_LEVEL=${{ env.LOG_LEVEL }},ALLOWED_ORIGINS=${{ needs.deploy-infrastructure.outputs.frontend_url }}}"
+                    --environment "Variables={ENVIRONMENT=${{ env.ENVIRONMENT }},API_STAGE=${{ env.API_STAGE }},LOG_LEVEL=${{ env.LOG_LEVEL }},ALLOWED_ORIGINS=http://localhost:5173,${{ needs.deploy-infrastructure.outputs.frontend_url }}}"
