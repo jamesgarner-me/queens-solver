@@ -108,14 +108,13 @@ jobs:
             - name: Create deployment package
               run: |
                   rm -rf deployment-package
-                  mkdir -p deployment-package/package
-                  # Copy source files to root level
+                  mkdir -p deployment-package
+                  # Copy source files
                   cp -r src/* deployment-package/
-                  # Install dependencies into package directory
-                  cd deployment-package/package
-                  python3 -m pip install -r ../../requirements.txt -t .
-                  cd ..
-                  # Create deployment zip including both source and dependencies
+                  # Install dependencies directly at root level
+                  cd deployment-package
+                  python3 -m pip install -r ../requirements.txt -t .
+                  # Create deployment zip
                   zip -r ../function.zip .
                   cd ..
 

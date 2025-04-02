@@ -34,7 +34,6 @@ Resources:
                     API_STAGE: !Ref Stage
                     LOG_LEVEL: INFO
                     ALLOWED_ORIGINS: !Ref FrontendCloudFrontUrl
-                    PYTHONPATH: /var/task/package
             Role: !GetAtt LambdaExecutionRole.Arn
 
     # Lambda Execution Role
