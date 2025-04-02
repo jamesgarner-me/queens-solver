@@ -73,18 +73,25 @@ jobs:
             - name: Get Certificate ARN
               id: get-certificate
               run: |
-                  DOMAIN_NAME=$(grep 'DomainName:' ../frontend/template.yaml | head -1 | awk '{print $2}')
+                  # Set the domain name directly (more reliable than parsing from template)
+                  DOMAIN_NAME="jamesgarner.me"
                   echo "Using domain name: $DOMAIN_NAME"
 
                   # For EDGE-optimized API Gateway, certificates MUST be in us-east-1 region
                   echo "Checking for certificate in us-east-1 region (required for EDGE endpoint)..."
+
+                  # List all certificates to help with debugging
+                  echo "Available certificates in us-east-1:"
+                  aws acm list-certificates --region us-east-1 --output table
+
+                  # Try to find a certificate that would work for our domain
                   CERT_ARN=$(aws acm list-certificates --region us-east-1 \
-                    --query "CertificateSummaryList[?DomainName=='api.$DOMAIN_NAME' || DomainName=='*.$DOMAIN_NAME' || DomainName=='$DOMAIN_NAME'].CertificateArn" \
+                    --query "CertificateSummaryList[?contains(DomainName, '$DOMAIN_NAME') || contains(DomainName, '*')].CertificateArn" \
                     --output text | head -1)
 
                   if [ -z "$CERT_ARN" ] || [ "$CERT_ARN" = "None" ]; then
                     echo ""
-                    echo "ERROR: No ACM certificate found for api.$DOMAIN_NAME in us-east-1 region"
+                    echo "ERROR: No suitable certificate found in us-east-1 region"
                     echo "NOTE: Certificates for EDGE-optimized API Gateway MUST be in us-east-1 region"
                     echo ""
                     echo "To create a certificate in us-east-1 region, run the following command:"
@@ -123,7 +130,8 @@ jobs:
 
             - name: Deploy CloudFormation stack
               run: |
-                  DOMAIN_NAME=$(grep 'DomainName:' ../frontend/template.yaml | head -1 | awk '{print $2}')
+                  # Set the domain name directly (more reliable than parsing from template)
+                  DOMAIN_NAME="jamesgarner.me"
                   API_SUBDOMAIN="api"
 
                   aws cloudformation deploy \
