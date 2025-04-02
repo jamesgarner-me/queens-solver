@@ -41,6 +41,9 @@ jobs:
         defaults:
             run:
                 working-directory: backend
+        outputs:
+            function_name: ${{ steps.get-function.outputs.function_name }}
+            frontend_url: ${{ steps.get-frontend-url.outputs.frontend_url }}
 
         steps:
             - uses: actions/checkout@v4
@@ -53,11 +56,13 @@ jobs:
                   aws-region: ${{ secrets.AWS_REGION }}
 
             - name: Get Frontend CloudFront URL
+              id: get-frontend-url
               run: |
                   FRONTEND_URL=$(aws cloudformation describe-stacks \
                     --stack-name queens-solver-frontend \
                     --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontURL`].OutputValue' \
                     --output text)
+                  echo "frontend_url=$FRONTEND_URL" >> $GITHUB_OUTPUT
                   echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
 
             - name: Deploy CloudFormation stack
@@ -125,4 +130,4 @@ jobs:
               run: |
                   aws lambda update-function-configuration \
                     --function-name ${{ needs.deploy-infrastructure.outputs.function_name }} \
-                    --environment "Variables={ENVIRONMENT=${{ env.ENVIRONMENT }},API_STAGE=${{ env.API_STAGE }},LOG_LEVEL=${{ env.LOG_LEVEL }},ALLOWED_ORIGINS=${{ env.FRONTEND_URL }}}"
+                    --environment "Variables={ENVIRONMENT=${{ env.ENVIRONMENT }},API_STAGE=${{ env.API_STAGE }},LOG_LEVEL=${{ env.LOG_LEVEL }},ALLOWED_ORIGINS=${{ needs.deploy-infrastructure.outputs.frontend_url }}}"
