@@ -91,6 +91,14 @@ jobs:
                   CERT_ARN=$(aws acm list-certificates --region us-east-1 \
                     --query "CertificateSummaryList[?DomainName=='${{ secrets.DOMAIN_NAME }}'].CertificateArn" \
                     --output text)
+
+                  if [ -z "$CERT_ARN" ] || [ "$CERT_ARN" = "None" ]; then
+                    echo "ERROR: No ACM certificate found for ${{ secrets.DOMAIN_NAME }} in us-east-1 region"
+                    echo "Please create a certificate in us-east-1 for CloudFront distribution"
+                    exit 1
+                  fi
+
+                  echo "Certificate ARN: $CERT_ARN"
                   echo "certificate_arn=$CERT_ARN" >> $GITHUB_OUTPUT
 
             - name: Deploy CloudFormation stack

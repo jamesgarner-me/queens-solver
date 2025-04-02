@@ -62,7 +62,6 @@ Resources:
                         QueryString: false
                         Cookies:
                             Forward: none
-                    PathPattern: '/queens-solver/*'
                 CacheBehaviors:
                     - PathPattern: '/queens-solver/*'
                       TargetOriginId: S3Origin
@@ -79,10 +78,10 @@ Resources:
                               Forward: none
                 CustomErrorResponses:
                     - ErrorCode: 403
-                      ResponsePagePath: /index.html
+                      ResponsePagePath: /queens-solver/index.html
                       ResponseCode: 200
                     - ErrorCode: 404
-                      ResponsePagePath: /index.html
+                      ResponsePagePath: /queens-solver/index.html
                       ResponseCode: 200
                 ViewerCertificate:
                     AcmCertificateArn: !Ref CertificateArn
