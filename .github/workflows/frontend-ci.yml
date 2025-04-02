@@ -106,6 +106,24 @@ jobs:
               run: |
                   aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }} --delete
 
+            - name: Get CloudFront URL
+              id: get-cloudfront-url
+              run: |
+                  CLOUDFRONT_URL=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-frontend \
+                    --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontURL`].OutputValue' \
+                    --output text)
+                  echo "cloudfront_url=$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
+
+            - name: Update backend with CloudFront URL
+              run: |
+                  aws cloudformation deploy \
+                    --template-file ../backend/template.yaml \
+                    --stack-name queens-solver-backend \
+                    --parameter-overrides FrontendCloudFrontUrl=${{ steps.get-cloudfront-url.outputs.cloudfront_url }} \
+                    --capabilities CAPABILITY_IAM \
+                    --no-fail-on-empty-changeset
+
             - name: Get CloudFront distribution ID
               id: get-cloudfront
               run: |

@@ -87,6 +87,8 @@ Resources:
         DependsOn:
             - ApiRootMethod
             - ApiBoardsLatestMethod
+            - ApiRootCorsMethod
+            - BoardsLatestCorsMethod
         Properties:
             RestApiId: !Ref QueensSolverApi
             Description: !Sub "Deployment for ${Stage} stage"
@@ -142,6 +144,36 @@ Resources:
                   ResponseModels:
                       application/json: "Empty"
                   ResponseParameters:
+                      method.response.header.Access-Control-Allow-Origin: true
+
+    # CORS Configuration for root
+    ApiRootCorsMethod:
+        Type: AWS::ApiGateway::Method
+        Properties:
+            RestApiId: !Ref QueensSolverApi
+            ResourceId: !GetAtt QueensSolverApi.RootResourceId
+            HttpMethod: OPTIONS
+            AuthorizationType: NONE
+            Integration:
+                Type: MOCK
+                IntegrationResponses:
+                    - StatusCode: 200
+                      ResponseParameters:
+                          method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                          method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                          method.response.header.Access-Control-Allow-Origin: !Sub "'${FrontendCloudFrontUrl}'"
+                      ResponseTemplates:
+                          application/json: "{}"
+                PassthroughBehavior: WHEN_NO_MATCH
+                RequestTemplates:
+                    application/json: '{"statusCode": 200}'
+            MethodResponses:
+                - StatusCode: 200
+                  ResponseModels:
+                      application/json: "Empty"
+                  ResponseParameters:
+                      method.response.header.Access-Control-Allow-Headers: true
+                      method.response.header.Access-Control-Allow-Methods: true
                       method.response.header.Access-Control-Allow-Origin: true
 
     # CORS Configuration for /boards/latest
