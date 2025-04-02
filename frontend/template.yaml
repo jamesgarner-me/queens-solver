@@ -104,6 +104,9 @@ Resources:
                       ResponseHeadersPolicyId: !Ref QueensSolverResponseHeadersPolicy
                       DefaultTTL: 0
                       MaxTTL: 0
+                      LambdaFunctionAssociations:
+                          - EventType: viewer-request
+                            LambdaFunctionARN: !Ref DirectoryIndexFunctionVersion
                 CustomErrorResponses:
                     # Queens-solver path error responses
                     - ErrorCode: 403
@@ -209,6 +212,62 @@ Resources:
                     ContentSecurityPolicy:
                         Override: true
                         ContentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.jamesgarner.me;"
+
+    # Lambda@Edge for directory index
+    DirectoryIndexFunctionRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service:
+                              - lambda.amazonaws.com
+                              - edgelambda.amazonaws.com
+                      Action: 'sts:AssumeRole'
+            ManagedPolicyArns:
+                - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+
+    DirectoryIndexFunction:
+        Type: AWS::Lambda::Function
+        Properties:
+            Code:
+                ZipFile: |
+                    'use strict';
+                    exports.handler = (event, context, callback) => {
+                        const request = event.Records[0].cf.request;
+                        
+                        // Extract URI and query string
+                        let uri = request.uri;
+                        
+                        // Handle directory paths
+                        if (uri.endsWith('/')) {
+                            request.uri += 'index.html';
+                        } else if (!uri.includes('.')) {
+                            // If the path doesn't have a file extension, assume it's a directory and add /index.html
+                            request.uri += '/index.html';
+                        }
+                        
+                        // Special case for /queens-solver without trailing slash
+                        if (uri === '/queens-solver') {
+                            request.uri = '/queens-solver/index.html';
+                        }
+                        
+                        callback(null, request);
+                    };
+            Handler: 'index.handler'
+            Role: !GetAtt DirectoryIndexFunctionRole.Arn
+            Runtime: nodejs18.x
+            Description: 'Lambda@Edge function to handle directory index requests'
+            Timeout: 5
+            MemorySize: 128
+
+    DirectoryIndexFunctionVersion:
+        Type: AWS::Lambda::Version
+        Properties:
+            FunctionName: !Ref DirectoryIndexFunction
+            Description: 'Initial version'
 
 Outputs:
     BucketName:

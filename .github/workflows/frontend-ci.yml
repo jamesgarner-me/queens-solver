@@ -142,24 +142,6 @@ jobs:
                   # Explicitly set content types for JavaScript files to ensure proper MIME types
                   aws s3 cp s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/assets/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/assets/ --recursive --exclude "*" --include "*.js" --content-type "application/javascript" --metadata-directive REPLACE
 
-                  # Create directory index redirects
-                  # Main queens-solver directory redirect
-                  aws s3api put-object \
-                    --bucket ${{ steps.get-bucket.outputs.bucket_name }} \
-                    --key "queens-solver/" \
-                    --website-redirect-location "/queens-solver/index.html"
-
-                  # Find all subdirectories and create redirects for them
-                  find dist -type d | while read -r dir; do
-                    relpath=${dir#dist/}
-                    if [ -n "$relpath" ]; then
-                      aws s3api put-object \
-                        --bucket ${{ steps.get-bucket.outputs.bucket_name }} \
-                        --key "queens-solver/${relpath}/" \
-                        --website-redirect-location "/queens-solver/${relpath}/index.html"
-                    fi
-                  done
-
             - name: Get CloudFront URL
               id: get-cloudfront-url
               run: |
