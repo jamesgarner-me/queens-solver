@@ -73,36 +73,10 @@ jobs:
             - name: Get Certificate ARN
               id: get-certificate
               run: |
-                  # Set the domain name directly (more reliable than parsing from template)
-                  DOMAIN_NAME="jamesgarner.me"
-                  echo "Using domain name: $DOMAIN_NAME"
-
-                  # For EDGE-optimized API Gateway, certificates MUST be in us-east-1 region
-                  echo "Checking for certificate in us-east-1 region (required for EDGE endpoint)..."
-
-                  # List all certificates to help with debugging
-                  echo "Available certificates in us-east-1:"
-                  aws acm list-certificates --region us-east-1 --output table
-
-                  # Try to find a certificate that would work for our domain
-                  CERT_ARN=$(aws acm list-certificates --region us-east-1 \
-                    --query "CertificateSummaryList[?contains(DomainName, '$DOMAIN_NAME') || contains(DomainName, '*')].CertificateArn" \
-                    --output text | head -1)
-
-                  if [ -z "$CERT_ARN" ] || [ "$CERT_ARN" = "None" ]; then
-                    echo ""
-                    echo "ERROR: No suitable certificate found in us-east-1 region"
-                    echo "NOTE: Certificates for EDGE-optimized API Gateway MUST be in us-east-1 region"
-                    echo ""
-                    echo "To create a certificate in us-east-1 region, run the following command:"
-                    echo "aws acm request-certificate --region us-east-1 --domain-name api.$DOMAIN_NAME --validation-method DNS"
-                    echo ""
-                    echo "After creating the certificate, follow the validation process before rerunning this workflow."
-                    echo "For more information: https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html"
-                    exit 1
-                  fi
-
-                  echo "Found Certificate ARN in us-east-1: $CERT_ARN"
+                  # Hard-coded approach - use a specific certificate ARN directly
+                  # Replace this ARN with your actual certificate ARN from us-east-1 region
+                  CERT_ARN="arn:aws:acm:us-east-1:449421028589:certificate/79fd171b-4dfa-47a4-9e6c-a186b9e76eb1"
+                  echo "Using certificate ARN: $CERT_ARN"
                   echo "certificate_arn=$CERT_ARN" >> $GITHUB_OUTPUT
 
             - name: Get S3 bucket name
@@ -130,7 +104,7 @@ jobs:
 
             - name: Deploy CloudFormation stack
               run: |
-                  # Set the domain name directly (more reliable than parsing from template)
+                  # Hardcode domain name
                   DOMAIN_NAME="jamesgarner.me"
                   API_SUBDOMAIN="api"
 
