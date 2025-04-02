@@ -184,13 +184,13 @@ Resources:
                 SecurityHeadersConfig:
                     ContentTypeOptions:
                         Override: true
-                    XFrameOptions:
+                    FrameOptions:
                         Override: true
-                        XFrameOption: SAMEORIGIN
+                        FrameOption: SAMEORIGIN
                     StrictTransportSecurity:
                         Override: true
                         IncludeSubdomains: true
-                        MaxAgeSec: 31536000 # 1 year
+                        MaxAgeSeconds: 31536000 # 1 year
                         Preload: true
                     ReferrerPolicy:
                         Override: true
