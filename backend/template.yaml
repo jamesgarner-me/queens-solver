@@ -12,6 +12,12 @@ Parameters:
         Type: String
         Description: The CloudFront URL of the frontend application
         Default: "https://dummy.cloudfront.net" # This will be overridden during deployment
+    DependenciesLayerBucket:
+        Type: String
+        Description: S3 bucket containing the dependencies layer
+    DependenciesLayerKey:
+        Type: String
+        Description: S3 key for the dependencies layer
 
 Resources:
     # Lambda Layer for Dependencies
@@ -22,7 +28,9 @@ Resources:
             Description: Python dependencies for Queens Solver
             CompatibleRuntimes:
                 - python3.13
-            ContentUri: dependencies.zip
+            Content:
+                S3Bucket: !Ref DependenciesLayerBucket
+                S3Key: !Ref DependenciesLayerKey
 
     # Lambda Function
     QueensSolverFunction:
