@@ -70,3 +70,6 @@ Outputs:
     CloudFrontURL:
         Description: URL for website hosted on CloudFront
         Value: !Sub https://${QueensSolverDistribution.DomainName}
+    CloudFrontDistributionId:
+        Description: ID of the CloudFront distribution
+        Value: !Ref QueensSolverDistribution

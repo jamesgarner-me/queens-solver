@@ -111,8 +111,8 @@ jobs:
               run: |
                   DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
                     --stack-name queens-solver-frontend \
-                    --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontURL`].OutputValue' \
-                    --output text | sed -E 's|https://([^.]+).*|\1|')
+                    --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionId`].OutputValue' \
+                    --output text)
                   echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
 
             - name: Invalidate CloudFront
