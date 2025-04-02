@@ -5,7 +5,7 @@
     "scripts": {
         "test": "npm run test:backend && npm run test:frontend",
         "test:frontend": "cd frontend && npm test",
-        "test:backend": "cd backend && python3 -m unittest tests.py",
+        "test:backend": "cd backend && python3 -m unittest discover tests",
         "test:frontend:watch": "cd frontend && npm run test:watch",
         "format": "npm run format:frontend && npm run format:backend",
         "format:frontend": "cd frontend && npm run format",
