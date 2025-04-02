@@ -139,13 +139,14 @@ Resources:
                     AccessControlMaxAgeSec: 600
                     OriginOverride: false
                     AccessControlAllowCredentials: false
+                SecurityHeadersConfig:
+                    XFrameOptions:
+                        Override: true
+                        XFrameOption: SAMEORIGIN
                 CustomHeadersConfig:
                     Items:
                         - Header: Content-Type-Options
                           Value: nosniff
-                          Override: true
-                        - Header: X-Frame-Options
-                          Value: SAMEORIGIN
                           Override: true
 
 Outputs:
