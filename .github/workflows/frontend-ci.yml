@@ -61,8 +61,22 @@ jobs:
                   npm install
                   npm install @rollup/rollup-linux-x64-gnu
 
-            - name: Build
-              run: npm run build
+            - name: Get API Gateway ID
+              run: |
+                  API_ID=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-backend \
+                    --query 'Stacks[0].Outputs[?OutputKey==`ApiEndpoint`].OutputValue' \
+                    --output text | sed -E 's|https://([^.]+).*|\1|')
+                  echo "API_GATEWAY_ID=$API_ID" >> $GITHUB_ENV
+
+            - name: Prepare environment variables
+              run: |
+                  # Create production env file with actual values
+                  sed -i "s/\${API_GATEWAY_ID}/${{ env.API_GATEWAY_ID }}/g" .env.production
+                  sed -i "s/\${AWS_REGION}/${{ secrets.AWS_REGION }}/g" .env.production
+
+            - name: Build for production
+              run: npm run build:production
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
@@ -71,10 +85,36 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ secrets.AWS_REGION }}
 
+            - name: Deploy CloudFormation stack
+              run: |
+                  aws cloudformation deploy \
+                    --template-file template.yaml \
+                    --stack-name queens-solver-frontend \
+                    --capabilities CAPABILITY_IAM \
+                    --no-fail-on-empty-changeset
+
+            - name: Get S3 bucket name
+              id: get-bucket
+              run: |
+                  BUCKET_NAME=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-frontend \
+                    --query 'Stacks[0].Outputs[?OutputKey==`BucketName`].OutputValue' \
+                    --output text)
+                  echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
+
             - name: Deploy to S3
               run: |
-                  aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
+                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }} --delete
+
+            - name: Get CloudFront distribution ID
+              id: get-cloudfront
+              run: |
+                  DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-frontend \
+                    --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontURL`].OutputValue' \
+                    --output text | sed -E 's|https://([^.]+).*|\1|')
+                  echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
 
             - name: Invalidate CloudFront
               run: |
-                  aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+                  aws cloudfront create-invalidation --distribution-id ${{ steps.get-cloudfront.outputs.distribution_id }} --paths "/*"

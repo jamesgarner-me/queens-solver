@@ -24,7 +24,7 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v5
               with:
-                  python-version: "3.9"
+                  python-version: "3.13" # Match the version in template.yaml
 
             - name: Install dependencies
               run: |
@@ -70,12 +70,13 @@ jobs:
                     --no-fail-on-empty-changeset
 
             - name: Get Lambda function name
+              id: get-function
               run: |
                   FUNCTION_NAME=$(aws cloudformation describe-stacks \
                     --stack-name queens-solver-backend \
                     --query 'Stacks[0].Outputs[?OutputKey==`QueensSolverFunction`].OutputValue' \
                     --output text)
-                  echo "LAMBDA_FUNCTION_NAME=$FUNCTION_NAME" >> $GITHUB_ENV
+                  echo "function_name=$FUNCTION_NAME" >> $GITHUB_OUTPUT
 
     deploy:
         needs: deploy-infrastructure
@@ -84,6 +85,10 @@ jobs:
         defaults:
             run:
                 working-directory: backend
+        env:
+            ENVIRONMENT: prod
+            API_STAGE: prod
+            LOG_LEVEL: INFO
 
         steps:
             - uses: actions/checkout@v4
@@ -113,5 +118,11 @@ jobs:
             - name: Update Lambda function
               run: |
                   aws lambda update-function-code \
-                    --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
+                    --function-name ${{ needs.deploy-infrastructure.outputs.function_name }} \
                     --zip-file fileb://function.zip
+
+            - name: Update Lambda environment variables
+              run: |
+                  aws lambda update-function-configuration \
+                    --function-name ${{ needs.deploy-infrastructure.outputs.function_name }} \
+                    --environment "Variables={ENVIRONMENT=${{ env.ENVIRONMENT }},API_STAGE=${{ env.API_STAGE }},LOG_LEVEL=${{ env.LOG_LEVEL }},ALLOWED_ORIGINS=${{ env.FRONTEND_URL }}}"

@@ -1,5 +1,4 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Transform: AWS::Serverless-2016-10-31
 
 Parameters:
     Stage:
@@ -14,34 +13,53 @@ Parameters:
         Description: The CloudFront URL of the frontend application
         Default: "https://dummy.cloudfront.net" # This will be overridden during deployment
 
-Globals:
-    Function:
-        Timeout: 30
-        Runtime: python3.13
-        MemorySize: 256
-        Environment:
-            Variables:
-                ENVIRONMENT: !Ref Stage
-                API_STAGE: !Ref Stage
-                LOG_LEVEL: INFO
-                ALLOWED_ORIGINS: !Ref FrontendCloudFrontUrl
-
 Resources:
     # Lambda Function
     QueensSolverFunction:
-        Type: AWS::Serverless::Function
+        Type: AWS::Lambda::Function
         Properties:
-            CodeUri: src/
+            FunctionName: !Sub ${AWS::StackName}-function-${Stage}
+            Runtime: python3.13
             Handler: lambda_function.lambda_handler
+            Code:
+                ZipFile: |
+                    # This is a placeholder. The actual code will be updated via the deploy job
+                    def lambda_handler(event, context):
+                        return {"statusCode": 200, "body": "Placeholder"}
+            Timeout: 30
+            MemorySize: 256
+            Environment:
+                Variables:
+                    ENVIRONMENT: !Ref Stage
+                    API_STAGE: !Ref Stage
+                    LOG_LEVEL: INFO
+                    ALLOWED_ORIGINS: !Ref FrontendCloudFrontUrl
+            Role: !GetAtt LambdaExecutionRole.Arn
+
+    # Lambda Execution Role
+    LambdaExecutionRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service: lambda.amazonaws.com
+                      Action: sts:AssumeRole
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
             Policies:
-                - AWSLambdaBasicExecutionRole
-                - Statement:
-                      - Effect: Allow
-                        Action:
-                            - logs:CreateLogGroup
-                            - logs:CreateLogStream
-                            - logs:PutLogEvents
-                        Resource: "*"
+                - PolicyName: LambdaLogging
+                  PolicyDocument:
+                      Version: "2012-10-17"
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - logs:CreateLogGroup
+                                - logs:CreateLogStream
+                                - logs:PutLogEvents
+                            Resource: "*"
 
     # API Gateway
     QueensSolverApi:

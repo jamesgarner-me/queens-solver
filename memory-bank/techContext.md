@@ -119,6 +119,7 @@
    - GitHub Actions workflows handle CI/CD:
      - backend-ci: Deploys backend to AWS
      - frontend-ci: Deploys frontend to AWS
+   - These files are located within folder /.github/workflows
 
 3. **Backend Deployment**
    ```bash
