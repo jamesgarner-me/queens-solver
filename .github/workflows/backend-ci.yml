@@ -34,7 +34,7 @@ jobs:
             - name: Run tests
               run: python -m unittest tests.py
 
-    deploy:
+    deploy-infrastructure:
         needs: test
         if: github.ref == 'refs/heads/main'
         runs-on: ubuntu-latest
@@ -45,20 +45,48 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
               with:
-                  python-version: "3.9"
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
 
-            - name: Create deployment package
+            - name: Get Frontend CloudFront URL
               run: |
-                  rm -rf deployment-package
-                  mkdir -p deployment-package/package
-                  cp -r src/* deployment-package/
-                  cd deployment-package/package
-                  python3 -m pip install -r ../../requirements.txt -t .
-                  cd ..
-                  zip -r ../function.zip package/* lambda_function.py config.py main.py __init__.py services/ utils/
+                  FRONTEND_URL=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-frontend \
+                    --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontURL`].OutputValue' \
+                    --output text)
+                  echo "FRONTEND_URL=$FRONTEND_URL" >> $GITHUB_ENV
+
+            - name: Deploy CloudFormation stack
+              run: |
+                  aws cloudformation deploy \
+                    --template-file template.yaml \
+                    --stack-name queens-solver-backend \
+                    --parameter-overrides Stage=prod FrontendCloudFrontUrl=${{ env.FRONTEND_URL }} \
+                    --capabilities CAPABILITY_IAM \
+                    --no-fail-on-empty-changeset
+
+            - name: Get Lambda function name
+              run: |
+                  FUNCTION_NAME=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-backend \
+                    --query 'Stacks[0].Outputs[?OutputKey==`QueensSolverFunction`].OutputValue' \
+                    --output text)
+                  echo "LAMBDA_FUNCTION_NAME=$FUNCTION_NAME" >> $GITHUB_ENV
+
+    deploy:
+        needs: deploy-infrastructure
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: backend
+
+        steps:
+            - uses: actions/checkout@v4
 
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v4
@@ -67,8 +95,23 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ secrets.AWS_REGION }}
 
+            - name: Create deployment package
+              run: |
+                  rm -rf deployment-package
+                  mkdir -p deployment-package/package
+                  # Copy all necessary files
+                  cp -r src/* deployment-package/
+                  cp lambda_function.py config.py main.py __init__.py deployment-package/
+                  cp -r services/ utils/ deployment-package/
+                  # Install dependencies
+                  cd deployment-package/package
+                  python3 -m pip install -r ../../requirements.txt -t .
+                  cd ..
+                  # Create deployment zip
+                  zip -r ../function.zip package/* lambda_function.py config.py main.py __init__.py services/ utils/
+
             - name: Update Lambda function
               run: |
                   aws lambda update-function-code \
-                    --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+                    --function-name ${{ env.LAMBDA_FUNCTION_NAME }} \
                     --zip-file fileb://function.zip

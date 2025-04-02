@@ -7,9 +7,12 @@ Parameters:
         Default: prod
         AllowedValues:
             - dev
-            - staging
             - prod
-        Description: The deployment stage (dev, staging, prod)
+        Description: The deployment stage (dev, prod)
+    FrontendCloudFrontUrl:
+        Type: String
+        Description: The CloudFront URL of the frontend application
+        Default: "https://dummy.cloudfront.net" # This will be overridden during deployment
 
 Globals:
     Function:
@@ -21,7 +24,7 @@ Globals:
                 ENVIRONMENT: !Ref Stage
                 API_STAGE: !Ref Stage
                 LOG_LEVEL: INFO
-                ALLOWED_ORIGINS: !Sub https://${CloudFrontDistribution.DomainName}
+                ALLOWED_ORIGINS: !Ref FrontendCloudFrontUrl
 
 Resources:
     # Lambda Function
@@ -144,7 +147,7 @@ Resources:
                       ResponseParameters:
                           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
                           method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
-                          method.response.header.Access-Control-Allow-Origin: "'*'"
+                          method.response.header.Access-Control-Allow-Origin: !Sub "'${FrontendCloudFrontUrl}'"
                       ResponseTemplates:
                           application/json: "{}"
                 PassthroughBehavior: WHEN_NO_MATCH
@@ -168,47 +171,6 @@ Resources:
             Principal: apigateway.amazonaws.com
             SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${QueensSolverApi}/*/*/*
 
-    # CloudFront Distribution
-    CloudFrontDistribution:
-        Type: AWS::CloudFront::Distribution
-        Properties:
-            DistributionConfig:
-                Enabled: true
-                DefaultRootObject: index.html
-                Origins:
-                    - DomainName: !Sub ${QueensSolverApi}.execute-api.${AWS::Region}.amazonaws.com
-                      Id: ApiGatewayOrigin
-                      OriginPath: !Sub "/${Stage}"
-                      CustomOriginConfig:
-                          HTTPPort: 80
-                          HTTPSPort: 443
-                          OriginProtocolPolicy: https-only
-                          OriginSSLProtocols:
-                              - TLSv1.2
-                DefaultCacheBehavior:
-                    TargetOriginId: ApiGatewayOrigin
-                    ViewerProtocolPolicy: redirect-to-https
-                    AllowedMethods:
-                        - GET
-                        - HEAD
-                        - OPTIONS
-                    CachedMethods:
-                        - GET
-                        - HEAD
-                    ForwardedValues:
-                        QueryString: true
-                        Cookies:
-                            Forward: none
-                    DefaultTTL: 0
-                    MinTTL: 0
-                    MaxTTL: 0
-                CustomErrorResponses:
-                    - ErrorCode: 404
-                      ResponseCode: 200
-                      ResponsePagePath: /index.html
-                HttpVersion: http2
-                PriceClass: PriceClass_100
-
 Outputs:
     ApiEndpoint:
         Description: API Gateway endpoint URL
@@ -216,6 +178,3 @@ Outputs:
     QueensSolverFunction:
         Description: Queens Solver Lambda Function ARN
         Value: !GetAtt QueensSolverFunction.Arn
-    CloudFrontDomain:
-        Description: CloudFront Distribution Domain Name
-        Value: !GetAtt CloudFrontDistribution.DomainName
