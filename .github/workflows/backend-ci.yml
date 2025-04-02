@@ -109,16 +109,15 @@ jobs:
               run: |
                   rm -rf deployment-package
                   mkdir -p deployment-package/package
-                  # Copy all necessary files
+                  # Copy source files to root level
                   cp -r src/* deployment-package/
-                  cp src/lambda_function.py src/config.py src/main.py src/__init__.py deployment-package/
-                  cp -r src/services/ src/utils/ deployment-package/
-                  # Install dependencies
+                  # Install dependencies into package directory
                   cd deployment-package/package
                   python3 -m pip install -r ../../requirements.txt -t .
                   cd ..
-                  # Create deployment zip
-                  zip -r ../function.zip package/* lambda_function.py config.py main.py __init__.py services/ utils/
+                  # Create deployment zip including both source and dependencies
+                  zip -r ../function.zip .
+                  cd ..
 
             - name: Update Lambda function
               run: |
