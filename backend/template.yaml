@@ -92,12 +92,6 @@ Resources:
             Description: !Sub "Deployment for ${Stage} stage"
 
     # API Gateway Resources
-    ApiRootResource:
-        Type: AWS::ApiGateway::Resource
-        Properties:
-            RestApiId: !Ref QueensSolverApi
-            ParentId: !GetAtt QueensSolverApi.RootResourceId
-            PathPart: ""
 
     ApiBoardsResource:
         Type: AWS::ApiGateway::Resource
