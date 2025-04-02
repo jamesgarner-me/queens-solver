@@ -25,18 +25,27 @@ The following changes have been implemented to support AWS API Gateway integrati
    - Updated `main.py` to support API Gateway stages, improved logging, and added a health check endpoint
    - Modified `lambda_function.py` for better AWS Lambda integration with API Gateway
    - Completely restructured `template.yaml` to properly configure API Gateway with stages (dev, prod)
+   - Implemented Lambda layers for Python dependencies management
 
-3. **Documentation**:
+3. **CI/CD Improvements**:
+   - Fixed Lambda layer deployment in the backend CI workflow
+   - Implemented S3-based dependency management for Lambda layers
+   - Added proper error handling and validation in CI/CD workflows
+   - Configured environment variables for Lambda functions
+   - Enhanced CORS configuration to enable cross-origin requests
+
+4. **Documentation**:
    - Created `README-API-GATEWAY.md` with detailed instructions for deployment and usage
    - Documented common issues and troubleshooting steps
+   - Updated memory bank with current deployment architecture
 
 ## Next Steps
 
 1. **Deployment and Testing**
-   - Deploy the updated infrastructure to AWS (production environment)
-   - Test API Gateway integration in all environments (dev (local), prod)
-   - Verify CORS configuration is working correctly
-   - Ensure local development still functions as expected
+   - ✅ Deploy the updated infrastructure to AWS (production environment)
+   - ✅ Test API Gateway integration in all environments (dev (local), prod)
+   - ✅ Verify CORS configuration is working correctly
+   - ✅ Ensure local development still functions as expected
 
 2. **Monitoring and Logging**
    - Set up CloudWatch alarms for API Gateway and Lambda

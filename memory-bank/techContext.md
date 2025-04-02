@@ -182,6 +182,8 @@
 | requests | 2.32.3 | HTTP client |
 | pydantic | 2.10.6 | Data validation |
 
+The backend dependencies are managed through a Lambda layer in the AWS environment, allowing for better separation between application code and dependencies. This improves deployment efficiency by only updating the changed components.
+
 ### Frontend Dependencies
 
 | Dependency | Version | Purpose |
@@ -233,6 +235,18 @@
    └── package.json          # Dependencies and scripts
    ```
 
+3. **CI/CD Workflow Structure**
+   ```
+   .github/workflows/
+   ├── backend-ci.yml        # Backend CI/CD workflow
+   │   ├── test job          # Runs tests for backend code
+   │   ├── deploy-infrastructure job # Deploys CloudFormation stack, creates Lambda layer
+   │   └── deploy job        # Updates Lambda function code and configuration
+   └── frontend-ci.yml       # Frontend CI/CD workflow
+       ├── test job          # Runs tests for frontend code
+       └── deploy job        # Builds and deploys frontend, updates backend with frontend URL
+   ```
+
 ### Development Practices
 
 1. **Type Safety**
@@ -257,8 +271,9 @@
    - Context API for application-wide state
    - Prop drilling minimization
 
-5. **Code Style**
-   - ESLint and Prettier for JavaScript/TypeScript
-   - Black and isort for Python
-   - Consistent naming conventions
-   - Documentation for complex functions
+5. **CI/CD Practices**
+   - Separate jobs for testing and deployment
+   - Environment-specific configurations
+   - Infrastructure as Code using CloudFormation
+   - Dependency management via Lambda layers
+   - Proper error handling and validation in workflows

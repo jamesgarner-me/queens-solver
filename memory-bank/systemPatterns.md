@@ -17,6 +17,7 @@ graph LR
         API[API Gateway]
         Stages[API Stages\n(Dev/Prod)]
         Lambda[Python Lambda]
+        Layer[Lambda Layer\n(Dependencies)]
         EnvVars[Environment Variables]
     end
     
@@ -30,6 +31,7 @@ graph LR
     EnvConfig --> API
     API --> Stages
     Stages --> Lambda
+    Lambda --> Layer
     Lambda --> EnvVars
     Lambda --> LinkedIn
 ```
@@ -48,14 +50,16 @@ graph LR
    - Implements solving algorithms
    - Exposes RESTful API endpoints via API Gateway
    - Deployed as AWS Lambda function
+   - Dependencies managed through Lambda layers
 
 3. **Infrastructure**
    - **Infrastructure as Code**: AWS CloudFormation templates are used (explicitly NOT using SAM)
    - **Deployment Automation**: GitHub workflows (backend-ci and frontend-ci) handle CI/CD pipelines
    - **CloudFront**: Content delivery network for frontend assets
-   - **S3**: Static hosting for frontend application
+   - **S3**: Static hosting for frontend application and storage for Lambda layer dependencies
    - **API Gateway**: RESTful API endpoint management
    - **Lambda**: Serverless function execution
+   - **Lambda Layers**: Dependency management for Lambda functions
    - **External Services**: LinkedIn API integration
 
 ## Key Technical Decisions
@@ -115,17 +119,20 @@ graph LR
    - **Backend**:
      - Lambda for serverless execution (production only)
      - API Gateway for HTTP endpoints (production only)
+     - Lambda Layer for dependency management
      - CloudWatch for monitoring (production only)
      - Local FastAPI server for development
      - Deployed via GitHub backend-ci workflow
    - **Infrastructure Provisioning**:
      - CloudFormation templates (explicitly NOT using SAM)
      - Automated deployment through GitHub workflows
+     - S3-based dependency management for Lambda layers
    - **Benefits**:
      - Scalable infrastructure
      - Cost-effective
      - Managed services
      - Automated deployment pipeline
+     - Efficient dependency management
    - **Trade-offs**:
      - Vendor lock-in
      - Cold starts
@@ -180,6 +187,7 @@ graph TD
     subgraph Backend
         API[API Gateway]
         Lambda[Python Lambda]
+        Layer[Lambda Layer]
         CW[CloudWatch]
     end
     
@@ -193,11 +201,13 @@ graph TD
     BECI --> CFN
     CFN --> S3
     CFN --> Lambda
+    CFN --> Layer
     CFN --> API
     UI --> CF
     CF --> S3
     UI --> API
     API --> Lambda
+    Lambda --> Layer
     Lambda --> CW
     Lambda --> LinkedIn
 ```

@@ -68,6 +68,12 @@ The Queens Solver project is currently in a **functional but basic state**. The 
    - Show the solution with queen placements
    - Handle loading and error states
 
+3. The infrastructure has been enhanced with:
+   - Properly configured Lambda layer for Python dependencies
+   - Improved CI/CD workflow for backend and frontend deployment
+   - CORS configuration to enable cross-origin requests between CloudFront and API Gateway
+   - Environment variables configuration for different deployment stages
+
 The project is usable in its current form but has opportunities for enhancement in terms of user experience, performance, and additional features.
 
 ## Known Issues
@@ -110,10 +116,16 @@ The project is usable in its current form but has opportunities for enhancement 
 - Created React frontend for visualization
 - Implemented proper error handling and loading states
 
+### Third Evolution
+- Deployed to AWS using Lambda, API Gateway, S3, and CloudFront
+- Set up CI/CD pipelines using GitHub Actions
+- Implemented CORS configuration to enable proper communication between frontend and backend
+
 ### Current Direction
 - Focus on stability and robustness
-- Improving user experience with better visualization
-- Preparing for potential LinkedIn API changes
+- Improving deployment architecture and CI/CD workflows
+- Ensuring reliable dependency management through Lambda layers
+- Addressing cross-origin resource sharing for secure API access
 - Documenting the system thoroughly via memory bank
 
 ### Future Considerations
