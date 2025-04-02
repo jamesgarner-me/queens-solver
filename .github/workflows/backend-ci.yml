@@ -160,16 +160,36 @@ jobs:
 
             - name: Update Lambda configuration
               run: |
-                  # Get the layer ARN
+                  # Get the full layer name from CloudFormation
+                  LAYER_NAME=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-backend \
+                    --query 'Stacks[0].Resources[?LogicalResourceId==`DependenciesLayer`].PhysicalResourceId' \
+                    --output text)
+
+                  echo "Layer name: $LAYER_NAME"
+
+                  if [ -z "$LAYER_NAME" ] || [ "$LAYER_NAME" = "None" ]; then
+                    echo "ERROR: Layer resource not found in CloudFormation stack"
+                    exit 1
+                  fi
+
+                  # Get the latest layer version's ARN
                   LAYER_ARN=$(aws lambda list-layer-versions \
-                    --layer-name $(aws cloudformation describe-stacks \
-                      --stack-name queens-solver-backend \
-                      --query 'Stacks[0].Resources[?LogicalResourceId==`DependenciesLayer`].PhysicalResourceId' \
-                      --output text) \
+                    --layer-name $LAYER_NAME \
                     --query 'LayerVersions[0].LayerVersionArn' \
                     --output text)
 
-                  # Update function configuration with both environment variables and layer
+                  echo "Layer ARN: $LAYER_ARN"
+
+                  # Ensure we have a valid layer ARN
+                  if [ -z "$LAYER_ARN" ] || [ "$LAYER_ARN" = "None" ]; then
+                    echo "ERROR: Failed to retrieve a valid Lambda layer ARN"
+                    echo "Layer versions response:"
+                    aws lambda list-layer-versions --layer-name $LAYER_NAME
+                    exit 1
+                  fi
+
+                  echo "Updating function with layer ARN: $LAYER_ARN"
                   aws lambda update-function-configuration \
                     --function-name ${{ needs.deploy-infrastructure.outputs.function_name }} \
                     --layers "$LAYER_ARN" \
