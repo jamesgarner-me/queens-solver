@@ -11,6 +11,28 @@ Parameters:
         Type: String
         Description: ARN of the SSL certificate for the domain (must be in us-east-1 for CloudFront)
 
+    CreateHostedZone:
+        Type: String
+        Default: 'false'
+        AllowedValues:
+            - 'true'
+            - 'false'
+        Description: Whether to create a new hosted zone (set to false if you already have one)
+
+    ExistingHostedZoneId:
+        Type: String
+        Default: ''
+        Description: ID of existing hosted zone (leave empty if CreateHostedZone is true)
+
+    AllowedOrigins:
+        Type: CommaDelimitedList
+        Default: 'https://jamesgarner.me,https://www.jamesgarner.me,http://localhost:5173'
+        Description: Comma-separated list of allowed origins for CORS
+
+Conditions:
+    ShouldCreateHostedZone: !Equals [!Ref CreateHostedZone, 'true']
+    UseExistingHostedZone: !Not [!Equals [!Ref ExistingHostedZoneId, '']]
+
 Resources:
     QueensSolverBucket:
         Type: AWS::S3::Bucket
@@ -62,6 +84,7 @@ Resources:
                         QueryString: false
                         Cookies:
                             Forward: none
+                    ResponseHeadersPolicyId: !Ref QueensSolverResponseHeadersPolicy
                 CacheBehaviors:
                     - PathPattern: '/queens-solver/*'
                       TargetOriginId: S3Origin
@@ -95,16 +118,20 @@ Resources:
             CloudFrontOriginAccessIdentityConfig:
                 Comment: !Sub ${AWS::StackName}-OAI
 
-    # Route 53 Records
+    # Route 53 Resources
     HostedZone:
         Type: AWS::Route53::HostedZone
+        Condition: ShouldCreateHostedZone
         Properties:
             Name: !Ref DomainName
 
     DomainRecord:
         Type: AWS::Route53::RecordSet
         Properties:
-            HostedZoneId: !Ref HostedZone
+            HostedZoneId: !If
+                - ShouldCreateHostedZone
+                - !Ref HostedZone
+                - !Ref ExistingHostedZoneId
             Name: !Ref DomainName
             Type: A
             AliasTarget:
@@ -115,7 +142,10 @@ Resources:
     WwwDomainRecord:
         Type: AWS::Route53::RecordSet
         Properties:
-            HostedZoneId: !Ref HostedZone
+            HostedZoneId: !If
+                - ShouldCreateHostedZone
+                - !Ref HostedZone
+                - !Ref ExistingHostedZoneId
             Name: !Sub www.${DomainName}
             Type: A
             AliasTarget:
@@ -131,23 +161,31 @@ Resources:
                 Comment: 'Response headers policy for Queens Solver application'
                 CorsConfig:
                     AccessControlAllowOrigins:
-                        Items: ['*']
+                        Items: !Ref AllowedOrigins
                     AccessControlAllowHeaders:
-                        Items: ['*']
+                        Items: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
                     AccessControlAllowMethods:
                         Items: ['GET', 'HEAD', 'OPTIONS']
                     AccessControlMaxAgeSec: 600
                     OriginOverride: false
                     AccessControlAllowCredentials: false
                 SecurityHeadersConfig:
+                    ContentTypeOptions:
+                        Override: true
                     XFrameOptions:
                         Override: true
                         XFrameOption: SAMEORIGIN
-                CustomHeadersConfig:
-                    Items:
-                        - Header: Content-Type-Options
-                          Value: nosniff
-                          Override: true
+                    StrictTransportSecurity:
+                        Override: true
+                        IncludeSubdomains: true
+                        MaxAgeSec: 31536000 # 1 year
+                        Preload: true
+                    ReferrerPolicy:
+                        Override: true
+                        ReferrerPolicy: strict-origin-when-cross-origin
+                    ContentSecurityPolicy:
+                        Override: true
+                        ContentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.jamesgarner.me;"
 
 Outputs:
     BucketName:
@@ -164,7 +202,11 @@ Outputs:
         Value: !Sub https://${DomainName}/queens-solver
     HostedZoneId:
         Description: ID of the Route 53 hosted zone
-        Value: !Ref HostedZone
+        Value: !If
+            - ShouldCreateHostedZone
+            - !Ref HostedZone
+            - !Ref ExistingHostedZoneId
     NameServers:
+        Condition: ShouldCreateHostedZone
         Description: Nameservers for the hosted zone
         Value: !Join [', ', !GetAtt HostedZone.NameServers]

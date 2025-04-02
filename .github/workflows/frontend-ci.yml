@@ -94,6 +94,22 @@ jobs:
                   echo "Using certificate ARN: $CERT_ARN"
                   echo "certificate_arn=$CERT_ARN" >> $GITHUB_OUTPUT
 
+            - name: Get Hosted Zone ID
+              id: get-hosted-zone
+              run: |
+                  # Check if hosted zone already exists
+                  HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name ${{ secrets.DOMAIN_NAME }}. --max-items 1 --query 'HostedZones[?Name==`'${{ secrets.DOMAIN_NAME }}.'\'].Id' --output text | sed 's/\/hostedzone\///')
+
+                  if [ -n "$HOSTED_ZONE_ID" ]; then
+                    echo "Existing hosted zone found: $HOSTED_ZONE_ID"
+                    echo "create_hosted_zone=false" >> $GITHUB_OUTPUT
+                    echo "hosted_zone_id=$HOSTED_ZONE_ID" >> $GITHUB_OUTPUT
+                  else
+                    echo "No existing hosted zone found, will create one"
+                    echo "create_hosted_zone=true" >> $GITHUB_OUTPUT
+                    echo "hosted_zone_id=" >> $GITHUB_OUTPUT
+                  fi
+
             - name: Deploy CloudFormation stack
               run: |
                   aws cloudformation deploy \
@@ -102,6 +118,9 @@ jobs:
                     --parameter-overrides \
                       DomainName=${{ secrets.DOMAIN_NAME }} \
                       CertificateArn=${{ steps.get-certificate.outputs.certificate_arn }} \
+                      CreateHostedZone=${{ steps.get-hosted-zone.outputs.create_hosted_zone }} \
+                      ExistingHostedZoneId=${{ steps.get-hosted-zone.outputs.hosted_zone_id }} \
+                      AllowedOrigins="https://${{ secrets.DOMAIN_NAME }},https://www.${{ secrets.DOMAIN_NAME }},https://api.${{ secrets.DOMAIN_NAME }},http://localhost:5173" \
                     --capabilities CAPABILITY_IAM \
                     --no-fail-on-empty-changeset
 
