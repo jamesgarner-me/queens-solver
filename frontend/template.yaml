@@ -41,7 +41,7 @@ Resources:
             # Remove public access configuration since we're using OAI
             WebsiteConfiguration:
                 IndexDocument: index.html
-                ErrorDocument: index.html
+                ErrorDocument: error/404.html
 
     QueensSolverBucketPolicy:
         Type: AWS::S3::BucketPolicy
@@ -85,6 +85,8 @@ Resources:
                         Cookies:
                             Forward: none
                     ResponseHeadersPolicyId: !Ref QueensSolverResponseHeadersPolicy
+                    DefaultTTL: 0
+                    MaxTTL: 0
                 CacheBehaviors:
                     - PathPattern: '/queens-solver/*'
                       TargetOriginId: S3Origin
@@ -100,23 +102,40 @@ Resources:
                           Cookies:
                               Forward: none
                       ResponseHeadersPolicyId: !Ref QueensSolverResponseHeadersPolicy
+                      DefaultTTL: 0
+                      MaxTTL: 0
                 CustomErrorResponses:
+                    # Root path error responses
                     - ErrorCode: 403
+                      ResponsePagePath: /error/404.html
+                      ResponseCode: 404
+                    - ErrorCode: 404
+                      ResponsePagePath: /error/404.html
+                      ResponseCode: 404
+
+                    # Queens-solver path error responses
+                    - ErrorCode: 403
+                      ErrorCachingMinTTL: 0
                       ResponsePagePath: /queens-solver/error/403.html
                       ResponseCode: 403
                     - ErrorCode: 404
+                      ErrorCachingMinTTL: 0
                       ResponsePagePath: /queens-solver/error/404.html
                       ResponseCode: 404
                     - ErrorCode: 500
+                      ErrorCachingMinTTL: 0
                       ResponsePagePath: /queens-solver/error/500.html
                       ResponseCode: 500
                     - ErrorCode: 502
+                      ErrorCachingMinTTL: 0
                       ResponsePagePath: /queens-solver/error/500.html
                       ResponseCode: 502
                     - ErrorCode: 503
+                      ErrorCachingMinTTL: 0
                       ResponsePagePath: /queens-solver/error/500.html
                       ResponseCode: 503
                     - ErrorCode: 504
+                      ErrorCachingMinTTL: 0
                       ResponsePagePath: /queens-solver/error/500.html
                       ResponseCode: 504
                 ViewerCertificate:

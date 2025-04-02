@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Page Not Found</title>
+        <title>James Garner</title>
         <style>
             body {
                 font-family:
@@ -18,7 +18,7 @@
                 min-height: 100vh;
             }
 
-            .error-container {
+            .container {
                 max-width: 600px;
                 padding: 2rem;
                 background-color: white;
@@ -28,28 +28,20 @@
                 margin: 2rem;
             }
 
-            .error-code {
-                font-size: 5rem;
-                font-weight: bold;
-                color: #44266c;
-                margin-bottom: 1rem;
-                line-height: 1;
-            }
-
-            .error-title {
+            .title {
                 font-size: 2rem;
                 color: #333;
                 margin-bottom: 1rem;
             }
 
-            .error-message {
+            .message {
                 font-size: 1.2rem;
                 color: #666;
                 line-height: 1.5;
                 margin-bottom: 2rem;
             }
 
-            .error-button {
+            .button {
                 display: inline-block;
                 padding: 0.75rem 1.5rem;
                 background-color: #44266c;
@@ -60,32 +52,27 @@
                 transition: background-color 0.2s;
             }
 
-            .error-button:hover,
-            .error-button:focus {
+            .button:hover,
+            .button:focus {
                 background-color: #5d3591;
             }
 
             @media (max-width: 600px) {
-                .error-code {
-                    font-size: 4rem;
-                }
-
-                .error-title {
+                .title {
                     font-size: 1.5rem;
                 }
 
-                .error-message {
+                .message {
                     font-size: 1rem;
                 }
             }
         </style>
     </head>
     <body>
-        <div class="error-container">
-            <div class="error-code" aria-hidden="true">404</div>
-            <h1 class="error-title">Page Not Found</h1>
-            <p class="error-message">The page you are looking for does not exist.</p>
-            <a href="/queens-solver" class="error-button">Go to Queens Solver</a>
+        <div class="container">
+            <h1 class="title">Welcome to jamesgarner.me</h1>
+            <p class="message">This site is under construction. In the meantime, check out my Queens Solver app!</p>
+            <a href="/queens-solver" class="button">Go to Queens Solver</a>
         </div>
     </body>
 </html>
