@@ -117,25 +117,35 @@ jobs:
                   cat > lambda-edge-function.js << 'EOF'
                   'use strict';
                   exports.handler = (event, context, callback) => {
+                      // Get the request from the event
                       const request = event.Records[0].cf.request;
                       
-                      // Extract URI and query string
+                      // Extract URI
                       let uri = request.uri;
                       
-                      // Handle directory paths
+                      console.log('Original URI: ', uri);
+                      
+                      // Handle directory paths - paths ending with /
                       if (uri.endsWith('/')) {
-                          request.uri += 'index.html';
-                      } else if (!uri.includes('.')) {
-                          // If the path doesn't have a file extension, assume it's a directory and add /index.html
-                          request.uri += '/index.html';
+                          request.uri = uri + 'index.html';
+                          console.log('Appended index.html to directory path: ', request.uri);
+                      } 
+                      // Handle paths without file extensions
+                      else if (!uri.includes('.')) {
+                          // Special case for /queens-solver
+                          if (uri === '/queens-solver') {
+                              request.uri = '/queens-solver/index.html';
+                              console.log('Handling special case for /queens-solver: ', request.uri);
+                          } else {
+                              // For other paths without extensions, assume directory and add /index.html
+                              request.uri = uri + '/index.html';
+                              console.log('Added /index.html to path without extension: ', request.uri);
+                          }
                       }
+                      // URL path is already pointing to a file with extension - no change needed
                       
-                      // Special case for /queens-solver without trailing slash
-                      if (uri === '/queens-solver') {
-                          request.uri = '/queens-solver/index.html';
-                      }
-                      
-                      callback(null, request);
+                      console.log('Final URI: ', request.uri);
+                      return callback(null, request);
                   };
                   EOF
 
@@ -198,6 +208,32 @@ jobs:
                       --zip-file fileb://lambda-edge-function.zip \
                       --region us-east-1
                   fi
+
+                  # Wait for the function to become active (after either creation or update)
+                  echo "Waiting for Lambda function to become active..."
+                  # Poll for function state
+                  FUNCTION_STATE="Pending"
+                  RETRY_COUNT=0
+                  MAX_RETRIES=30
+
+                  while [ "$FUNCTION_STATE" != "Active" ] && [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+                    sleep 5
+                    FUNCTION_INFO=$(aws lambda get-function \
+                      --function-name queens-solver-directory-index \
+                      --region us-east-1)
+                    
+                    FUNCTION_STATE=$(echo $FUNCTION_INFO | jq -r '.Configuration.State')
+                    echo "Current function state: $FUNCTION_STATE"
+                    
+                    RETRY_COUNT=$((RETRY_COUNT+1))
+                  done
+
+                  if [ "$FUNCTION_STATE" != "Active" ]; then
+                    echo "Lambda function did not become active within the timeout period"
+                    exit 1
+                  fi
+
+                  echo "Lambda function is now active"
 
                   # Create version
                   VERSION_OUTPUT=$(aws lambda publish-version \
