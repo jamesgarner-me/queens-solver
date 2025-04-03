@@ -74,7 +74,7 @@ Resources:
                     ENVIRONMENT: !Ref Stage
                     API_STAGE: !Ref Stage
                     LOG_LEVEL: INFO
-                    ALLOWED_ORIGINS: !Sub "${FrontendCloudFrontUrl},https://${DomainName},https://www.${DomainName},http://localhost:5173"
+                    ALLOWED_ORIGINS: !Sub "https://${DomainName}"
             Role: !GetAtt LambdaExecutionRole.Arn
             Layers:
                 - !Ref DependenciesLayer
