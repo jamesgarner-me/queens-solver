@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Button from './Button';
 import './Modal.css';
 import { useModal } from '../../context/ModalContext';
+import howToGif from '/queens-solve-howto.gif'; // Import the GIF file
 
 const InstructionModal: React.FC = () => {
     const { isModalOpen, closeModal } = useModal();
@@ -102,7 +103,7 @@ const InstructionModal: React.FC = () => {
                 {showGif ? (
                     <div className="demo-gif">
                         <img
-                            src="/queens-solve-howto.gif"
+                            src={howToGif}
                             alt="Queens Solver gameplay demonstration showing how to reveal queens and use the hint button"
                             width="100%"
                             height="auto"

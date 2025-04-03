@@ -82,6 +82,13 @@ jobs:
                   sed -i "s/\${API_GATEWAY_ID}/${{ env.API_GATEWAY_ID }}/g" .env.production
                   sed -i "s/\${AWS_REGION}/${{ secrets.AWS_REGION }}/g" .env.production
 
+                  # Make sure the base path is correctly set
+                  grep -q "VITE_BASE_PATH=" .env.production || echo "VITE_BASE_PATH=/queens-solver" >> .env.production
+
+                  # Display the environment variables for debugging
+                  echo "Environment variables for build:"
+                  cat .env.production
+
             - name: Build for production
               run: npm run build:production
 
