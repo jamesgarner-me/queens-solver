@@ -29,6 +29,10 @@ Parameters:
         Default: 'https://jamesgarner.me,https://www.jamesgarner.me,http://localhost:5173'
         Description: Comma-separated list of allowed origins for CORS
 
+    LambdaEdgeFunctionARN:
+        Type: String
+        Description: ARN of the Lambda@Edge function for directory index handling (must be from us-east-1)
+
 Conditions:
     ShouldCreateHostedZone: !Equals [!Ref CreateHostedZone, 'true']
     UseExistingHostedZone: !Not [!Equals [!Ref ExistingHostedZoneId, '']]
@@ -71,6 +75,10 @@ Resources:
                       Id: S3Origin
                       S3OriginConfig:
                           OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+                # Default cache behavior for root path
+                # - Honors S3 cache-control headers for optimal caching
+                # - Restricts methods to GET/HEAD for security
+                # - No query string or cookie forwarding to improve cache hit ratio
                 DefaultCacheBehavior:
                     TargetOriginId: S3Origin
                     ViewerProtocolPolicy: redirect-to-https
@@ -85,8 +93,15 @@ Resources:
                         Cookies:
                             Forward: none
                     ResponseHeadersPolicyId: !Ref QueensSolverResponseHeadersPolicy
-                    DefaultTTL: 0
-                    MaxTTL: 0
+                    # Use origin cache headers to control TTL
+                    # This allows S3's cache-control headers to determine caching behavior
+                    DefaultTTL: 86400 # 24 hours default if no cache header
+                    MinTTL: 0 # Allow items to skip cache if needed
+                    MaxTTL: 31536000 # 1 year max to match S3 headers
+                # Cache behavior for Queens Solver application
+                # - Specific configuration for /queens-solver/* paths
+                # - Uses Lambda@Edge for proper directory index handling
+                # - Honors S3 cache-control headers like the default behavior
                 CacheBehaviors:
                     - PathPattern: '/queens-solver/*'
                       TargetOriginId: S3Origin
@@ -102,11 +117,19 @@ Resources:
                           Cookies:
                               Forward: none
                       ResponseHeadersPolicyId: !Ref QueensSolverResponseHeadersPolicy
-                      DefaultTTL: 0
-                      MaxTTL: 0
+                      # Use origin cache headers to control TTL
+                      DefaultTTL: 86400 # 24 hours default if no cache header
+                      MinTTL: 0 # Allow items to skip cache if needed
+                      MaxTTL: 31536000 # 1 year max to match S3 headers
+                      # Lambda@Edge function handles directory index requests
+                      # e.g., /queens-solver -> /queens-solver/index.html
                       LambdaFunctionAssociations:
                           - EventType: viewer-request
-                            LambdaFunctionARN: !Ref DirectoryIndexFunctionVersion
+                            LambdaFunctionARN: !Ref LambdaEdgeFunctionARN
+                # Custom error responses for both root and application paths
+                # - Error pages are never cached (ErrorCachingMinTTL: 0)
+                # - Specific error pages for queens-solver application
+                # - Generic error handling for root domain
                 CustomErrorResponses:
                     # Queens-solver path error responses
                     - ErrorCode: 403
@@ -212,62 +235,6 @@ Resources:
                     ContentSecurityPolicy:
                         Override: true
                         ContentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.jamesgarner.me;"
-
-    # Lambda@Edge for directory index
-    DirectoryIndexFunctionRole:
-        Type: AWS::IAM::Role
-        Properties:
-            AssumeRolePolicyDocument:
-                Version: '2012-10-17'
-                Statement:
-                    - Effect: Allow
-                      Principal:
-                          Service:
-                              - lambda.amazonaws.com
-                              - edgelambda.amazonaws.com
-                      Action: 'sts:AssumeRole'
-            ManagedPolicyArns:
-                - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-
-    DirectoryIndexFunction:
-        Type: AWS::Lambda::Function
-        Properties:
-            Code:
-                ZipFile: |
-                    'use strict';
-                    exports.handler = (event, context, callback) => {
-                        const request = event.Records[0].cf.request;
-                        
-                        // Extract URI and query string
-                        let uri = request.uri;
-                        
-                        // Handle directory paths
-                        if (uri.endsWith('/')) {
-                            request.uri += 'index.html';
-                        } else if (!uri.includes('.')) {
-                            // If the path doesn't have a file extension, assume it's a directory and add /index.html
-                            request.uri += '/index.html';
-                        }
-                        
-                        // Special case for /queens-solver without trailing slash
-                        if (uri === '/queens-solver') {
-                            request.uri = '/queens-solver/index.html';
-                        }
-                        
-                        callback(null, request);
-                    };
-            Handler: 'index.handler'
-            Role: !GetAtt DirectoryIndexFunctionRole.Arn
-            Runtime: nodejs18.x
-            Description: 'Lambda@Edge function to handle directory index requests'
-            Timeout: 5
-            MemorySize: 128
-
-    DirectoryIndexFunctionVersion:
-        Type: AWS::Lambda::Version
-        Properties:
-            FunctionName: !Ref DirectoryIndexFunction
-            Description: 'Initial version'
 
 Outputs:
     BucketName:

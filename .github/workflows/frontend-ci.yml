@@ -110,7 +110,110 @@ jobs:
                     echo "hosted_zone_id=" >> $GITHUB_OUTPUT
                   fi
 
-            - name: Deploy CloudFormation stack
+            # Deploy Lambda@Edge function in us-east-1 region
+            - name: Deploy Lambda@Edge function in us-east-1
+              run: |
+                  # First, extract the Lambda function code from template.yaml
+                  cat > lambda-edge-function.js << 'EOF'
+                  'use strict';
+                  exports.handler = (event, context, callback) => {
+                      const request = event.Records[0].cf.request;
+                      
+                      // Extract URI and query string
+                      let uri = request.uri;
+                      
+                      // Handle directory paths
+                      if (uri.endsWith('/')) {
+                          request.uri += 'index.html';
+                      } else if (!uri.includes('.')) {
+                          // If the path doesn't have a file extension, assume it's a directory and add /index.html
+                          request.uri += '/index.html';
+                      }
+                      
+                      // Special case for /queens-solver without trailing slash
+                      if (uri === '/queens-solver') {
+                          request.uri = '/queens-solver/index.html';
+                      }
+                      
+                      callback(null, request);
+                  };
+                  EOF
+
+                  # Create Lambda deployment package
+                  zip lambda-edge-function.zip lambda-edge-function.js
+
+                  # Create or update the Lambda function in us-east-1
+                  # First check if role exists
+                  ROLE_ARN=$(aws iam list-roles --query "Roles[?RoleName=='queens-solver-lambda-edge-role'].Arn" --output text --region us-east-1 || echo "")
+
+                  if [ -z "$ROLE_ARN" ]; then
+                    # Create role and attach policy
+                    aws iam create-role \
+                      --role-name queens-solver-lambda-edge-role \
+                      --assume-role-policy-document '{
+                        "Version": "2012-10-17",
+                        "Statement": [
+                          {
+                            "Effect": "Allow",
+                            "Principal": {
+                              "Service": [
+                                "lambda.amazonaws.com",
+                                "edgelambda.amazonaws.com"
+                              ]
+                            },
+                            "Action": "sts:AssumeRole"
+                          }
+                        ]
+                      }' \
+                      --region us-east-1
+                    
+                    aws iam attach-role-policy \
+                      --role-name queens-solver-lambda-edge-role \
+                      --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole \
+                      --region us-east-1
+
+                    # Wait for role to propagate
+                    sleep 10
+                    
+                    ROLE_ARN=$(aws iam get-role --role-name queens-solver-lambda-edge-role --query "Role.Arn" --output text --region us-east-1)
+                  fi
+
+                  # Check if function exists
+                  FUNCTION_EXISTS=$(aws lambda list-functions --query "Functions[?FunctionName=='queens-solver-directory-index'].FunctionName" --output text --region us-east-1 || echo "")
+
+                  if [ -z "$FUNCTION_EXISTS" ]; then
+                    # Create function
+                    aws lambda create-function \
+                      --function-name queens-solver-directory-index \
+                      --runtime nodejs18.x \
+                      --role "$ROLE_ARN" \
+                      --handler lambda-edge-function.handler \
+                      --zip-file fileb://lambda-edge-function.zip \
+                      --description "Lambda@Edge function to handle directory index requests" \
+                      --region us-east-1
+                  else
+                    # Update function
+                    aws lambda update-function-code \
+                      --function-name queens-solver-directory-index \
+                      --zip-file fileb://lambda-edge-function.zip \
+                      --region us-east-1
+                  fi
+
+                  # Create version
+                  VERSION_OUTPUT=$(aws lambda publish-version \
+                    --function-name queens-solver-directory-index \
+                    --description "Version for Lambda@Edge deployment" \
+                    --region us-east-1)
+
+                  # Get function ARN with version
+                  LAMBDA_VERSION_ARN=$(echo $VERSION_OUTPUT | jq -r '.FunctionArn')
+
+                  # Save ARN to environment
+                  echo "LAMBDA_VERSION_ARN=$LAMBDA_VERSION_ARN" >> $GITHUB_ENV
+
+                  echo "Lambda@Edge function ARN with version: $LAMBDA_VERSION_ARN"
+
+            - name: Deploy CloudFormation stack with Lambda@Edge reference
               run: |
                   aws cloudformation deploy \
                     --template-file template.yaml \
@@ -121,6 +224,7 @@ jobs:
                       CreateHostedZone=${{ steps.get-hosted-zone.outputs.create_hosted_zone }} \
                       ExistingHostedZoneId=${{ steps.get-hosted-zone.outputs.hosted_zone_id }} \
                       AllowedOrigins="https://${{ secrets.DOMAIN_NAME }},https://www.${{ secrets.DOMAIN_NAME }},https://api.${{ secrets.DOMAIN_NAME }},http://localhost:5173" \
+                      LambdaEdgeFunctionARN="${{ env.LAMBDA_VERSION_ARN }}" \
                     --capabilities CAPABILITY_IAM \
                     --no-fail-on-empty-changeset
 
@@ -135,12 +239,39 @@ jobs:
 
             - name: Deploy to S3
               run: |
-                  # Deploy with proper content types
-                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver --delete --cache-control "max-age=31536000,public" --exclude "*.html"
-                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver --delete --cache-control "max-age=0,no-cache,no-store,must-revalidate" --content-type "text/html" --include "*.html"
+                  # Deploy static assets with long cache duration (1 year)
+                  # These are safe to cache aggressively as they include content hash in filenames
+                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver \
+                    --delete \
+                    --cache-control "max-age=31536000,public" \
+                    --exclude "*.html" \
+                    --exclude "error/*"
 
-                  # Explicitly set content types for JavaScript files to ensure proper MIME types
-                  aws s3 cp s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/assets/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/assets/ --recursive --exclude "*" --include "*.js" --content-type "application/javascript" --metadata-directive REPLACE
+                  # Deploy HTML files with short cache duration (24 hours)
+                  # This allows for quicker updates while still providing some caching benefit
+                  aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver \
+                    --delete \
+                    --cache-control "max-age=86400,public" \
+                    --content-type "text/html" \
+                    --include "*.html" \
+                    --exclude "error/*"
+
+                  # Deploy error pages with no caching
+                  # This ensures error pages are always fresh
+                  aws s3 sync dist/error/ s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/error \
+                    --delete \
+                    --cache-control "max-age=0,no-cache,no-store,must-revalidate" \
+                    --content-type "text/html"
+
+                  # Ensure correct content types for JavaScript files
+                  aws s3 cp s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/assets/ \
+                    s3://${{ steps.get-bucket.outputs.bucket_name }}/queens-solver/assets/ \
+                    --recursive \
+                    --exclude "*" \
+                    --include "*.js" \
+                    --content-type "application/javascript" \
+                    --metadata-directive REPLACE \
+                    --cache-control "max-age=31536000,public"
 
             - name: Get CloudFront URL
               id: get-cloudfront-url
