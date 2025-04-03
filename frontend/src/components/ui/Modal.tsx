@@ -43,11 +43,19 @@ const InstructionModal: React.FC = () => {
             }, 10);
         }
 
+        // Prevent body scrolling when modal is open
+        if (isModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
         // Restore focus when modal closes
         return () => {
             if (document.activeElement instanceof HTMLElement) {
                 document.activeElement.blur();
             }
+            document.body.style.overflow = '';
         };
     }, [isModalOpen]);
 
