@@ -347,6 +347,21 @@ jobs:
                     --capabilities CAPABILITY_IAM \
                     --no-fail-on-empty-changeset
 
+                  # Check if we need to redeploy the Lambda function code
+                  echo "Checking if Lambda function code needs to be updated..."
+                  FUNCTION_NAME=$(aws cloudformation describe-stacks \
+                    --stack-name queens-solver-backend \
+                    --query 'Stacks[0].Outputs[?OutputKey==`FunctionName`].OutputValue' \
+                    --output text)
+
+                  if [ -n "$FUNCTION_NAME" ]; then
+                    echo "Updating Lambda function code: $FUNCTION_NAME"
+                    cd ../backend
+                    ./deploy.sh
+                  else
+                    echo "Could not determine Lambda function name, skipping code update"
+                  fi
+
             - name: Get CloudFront distribution ID
               id: get-cloudfront
               run: |
