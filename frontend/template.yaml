@@ -103,7 +103,7 @@ Resources:
                 # - Uses Lambda@Edge for proper directory index handling
                 # - Honors S3 cache-control headers like the default behavior
                 CacheBehaviors:
-                    - PathPattern: '/queens-solver/*'
+                    - PathPattern: '/queens-solver*'
                       TargetOriginId: S3Origin
                       ViewerProtocolPolicy: redirect-to-https
                       AllowedMethods:
