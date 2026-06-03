@@ -3,6 +3,10 @@
 deployment-package
 *.zip
 
+# Cookie jars / session credentials (never commit)
+cookies.txt
+*.cookies
+
 # Include subdirectory gitignore files
 !backend/.gitignore
 !frontend/.gitignore
